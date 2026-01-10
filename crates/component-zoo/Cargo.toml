@@ -1,0 +1,10 @@
+[package]
+name = "component-zoo"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Component showcase for makepad-component"
+
+[dependencies]
+makepad-component = { workspace = true }
+makepad-widgets = { workspace = true }

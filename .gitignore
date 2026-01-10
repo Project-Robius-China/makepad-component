@@ -1,0 +1,15 @@
+# Build artifacts
+/target
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Cargo lock for library (optional - uncomment if needed)
+# Cargo.lock
+.claude
