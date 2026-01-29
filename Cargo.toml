@@ -14,3 +14,4 @@ publish = false
 [workspace.dependencies]
 makepad-components = { path = "components" }
 makepad-widgets    = { git = "https://github.com/Project-Robius-China/makepad", branch = "makepad_component_used_makepad_version" }
+makepad-shell      = { git = "https://github.com/Project-Robius-China/makepad-shell.git", branch = "main" }

@@ -10,6 +10,7 @@ crate-type = ["lib", "cdylib"]
 
 [dependencies]
 makepad-widgets = { workspace = true }
+makepad-shell   = { workspace = true }
 
 [features]
 Accordion               = []

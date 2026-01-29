@@ -1,4 +1,5 @@
 pub extern crate makepad_widgets;
+pub mod shell;
 
 pub mod theme;
 #[cfg(feature = "Accordion")]
