@@ -32,6 +32,7 @@ live_design! {
     use makepad_components::input::*;
     use makepad_components::label::*;
     use makepad_components::layout::*;
+    use makepad_components::link::*;
     use makepad_components::list::*;
     use makepad_components::modal::*;
     use makepad_components::notification::*;
@@ -873,6 +874,67 @@ live_design! {
                                         <MpLabel> {
                                             text: "Hello World, Hello Universe"
                                             highlight: "hello"
+                                        }
+                                    }
+                                }
+                            }
+
+                            <MpDivider> {}
+
+                            // ===== Link Section =====
+                            <View> {
+                                width: Fill, height: Fit,
+                                flow: Down,
+                                spacing: 16,
+
+                                <SectionHeader> { text: "Link" }
+
+                                // Basic links
+                                <View> {
+                                    width: Fit, height: Fit,
+                                    flow: Down,
+                                    spacing: 8,
+
+                                    <SubsectionLabel> { text: "Basic Links" }
+
+                                    <View> {
+                                        width: Fit, height: Fit,
+                                        flow: Right,
+                                        spacing: 24,
+
+                                        <MpLink> {
+                                            text: "Simple Link"
+                                        }
+                                        <MpLink> {
+                                            text: "Visit Makepad"
+                                            href: "https://makepad.dev"
+                                        }
+                                        <MpLink> {
+                                            text: "GitHub"
+                                            href: "https://github.com/makepad/makepad"
+                                        }
+                                    }
+                                }
+
+                                // Disabled state
+                                <View> {
+                                    width: Fit, height: Fit,
+                                    flow: Down,
+                                    spacing: 8,
+
+                                    <SubsectionLabel> { text: "Disabled State" }
+
+                                    <View> {
+                                        width: Fit, height: Fit,
+                                        flow: Right,
+                                        spacing: 24,
+
+                                        <MpLink> {
+                                            text: "Active Link"
+                                        }
+                                        <MpLink> {
+                                            text: "Disabled Link"
+                                            disabled: true
                                         }
                                     }
                                 }
