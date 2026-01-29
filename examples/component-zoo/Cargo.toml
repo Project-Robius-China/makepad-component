@@ -19,6 +19,7 @@ makepad-components = { workspace = true, features = [
     "Input",
     "Label",
     "Layout",
+    "Link",
     "List",
     "Modal",
     "Notification",

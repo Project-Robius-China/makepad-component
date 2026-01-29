@@ -49,6 +49,10 @@ pub mod label;
 #[path ="./layout/layout.rs"]
 pub mod layout;
 
+#[cfg(feature = "Link")]
+#[path ="./link/link.rs"]
+pub mod link;
+
 #[cfg(feature = "List")]
 #[path ="./list/list.rs"]
 pub mod list;
@@ -133,6 +137,8 @@ pub fn live_design(cx: &mut Cx) {
     label::live_design(cx);
     #[cfg(feature = "Layout")]
     layout::live_design(cx);
+    #[cfg(feature = "Link")]
+    link::live_design(cx);
     #[cfg(feature = "List")]
     list::live_design(cx);
     #[cfg(feature = "Modal")]
