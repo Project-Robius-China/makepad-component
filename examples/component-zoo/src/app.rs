@@ -4,6 +4,7 @@ use makepad_components::badge::MpBadgeWidgetRefExt;
 use makepad_components::button::MpButtonWidgetRefExt;
 use makepad_components::card::MpCardAction;
 use makepad_components::checkbox::MpCheckboxWidgetRefExt;
+use makepad_components::color_picker::MpColorPickerWidgetRefExt;
 use makepad_components::modal::MpModalAction;
 use makepad_components::modal::MpModalWidgetWidgetRefExt;
 use makepad_components::notification::MpNotificationWidgetWidgetRefExt;
@@ -27,6 +28,7 @@ live_design! {
     use makepad_components::button::*;
     use makepad_components::card::*;
     use makepad_components::checkbox::*;
+    use makepad_components::color_picker::*;
     use makepad_components::divider::*;
     use makepad_components::dropdown::*;
     use makepad_components::input::*;
@@ -600,6 +602,71 @@ live_design! {
                                                 color: (FOREGROUND)
                                             }
                                             text: "Range: 30 - 70 (step 5)"
+                                        }
+                                    }
+                                }
+                            }
+
+                            <MpDivider> {}
+
+                            // ===== ColorPicker Section =====
+                            <View> {
+                                width: Fill, height: Fit,
+                                flow: Down,
+                                spacing: 16,
+
+                                <SectionHeader> { text: "ColorPicker" }
+
+                                // Default ColorPicker
+                                <View> {
+                                    width: Fill, height: Fit,
+                                    flow: Down,
+                                    spacing: 8,
+
+                                    <SubsectionLabel> { text: "Default" }
+
+                                    <View> {
+                                        width: Fill, height: Fit,
+                                        flow: Right,
+                                        spacing: 24,
+                                        align: { y: 0.0 }
+
+                                        color_picker = <MpColorPicker> {}
+
+                                        <View> {
+                                            width: Fit, height: Fit,
+                                            flow: Down,
+                                            spacing: 8,
+
+                                            <SubsectionLabel> { text: "Selected Color" }
+
+                                            color_display = <View> {
+                                                width: 100,
+                                                height: 100,
+                                                show_bg: true,
+                                                draw_bg: {
+                                                    color: #ff0000
+                                                    instance radius: 8.0
+
+                                                    fn pixel(self) -> vec4 {
+                                                        let sdf = Sdf2d::viewport(self.pos * self.rect_size);
+                                                        let sz = self.rect_size;
+                                                        sdf.box(0.5, 0.5, sz.x - 1.0, sz.y - 1.0, self.radius);
+                                                        sdf.fill(self.color);
+                                                        sdf.stroke(#e2e8f0, 1.0);
+                                                        return sdf.result;
+                                                    }
+                                                }
+                                            }
+
+                                            color_hex_label = <Label> {
+                                                width: Fit, height: Fit,
+                                                draw_text: {
+                                                    text_style: <THEME_FONT_REGULAR>{ font_size: 14.0 }
+                                                    color: (FOREGROUND)
+                                                }
+                                                text: "#FF0000"
+                                            }
                                         }
                                     }
                                 }
@@ -3520,6 +3587,16 @@ impl MatchEvent for App {
             let start = value.start() as i32;
             let end = value.end() as i32;
             self.ui.label(ids!(slider_range_success_label)).set_text(cx, &format!("Range: {} - {} (step 5)", start, end));
+        }
+
+        // Handle color picker changes
+        if let Some(hsv) = self.ui.mp_color_picker(ids!(color_picker)).changed(&actions) {
+            let hex = hsv.to_hex();
+            let color = hsv.to_vec4();
+            self.ui.view(ids!(color_display)).apply_over(cx, live! {
+                draw_bg: { color: (color) }
+            });
+            self.ui.label(ids!(color_hex_label)).set_text(cx, &format!("#{}", hex));
         }
 
         // Handle input changes
