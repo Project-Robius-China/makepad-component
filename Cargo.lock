@@ -541,7 +541,7 @@ dependencies = [
 [[package]]
 name = "makepad-shell"
 version = "0.0.1"
-source = "git+https://github.com/Project-Robius-China/makepad-shell.git?branch=main#37591a7afcc8e48c5b71a758aae61a6ab7fcc0b4"
+source = "git+https://github.com/Project-Robius-China/makepad-shell.git?branch=main#bf7e3dda3e54c6b2efb820c3a76baa10293db556"
 dependencies = [
  "makepad-shell-core",
  "makepad-shell-platforms",
@@ -550,12 +550,12 @@ dependencies = [
 [[package]]
 name = "makepad-shell-core"
 version = "0.0.1"
-source = "git+https://github.com/Project-Robius-China/makepad-shell.git?branch=main#37591a7afcc8e48c5b71a758aae61a6ab7fcc0b4"
+source = "git+https://github.com/Project-Robius-China/makepad-shell.git?branch=main#bf7e3dda3e54c6b2efb820c3a76baa10293db556"
 
 [[package]]
 name = "makepad-shell-platforms"
 version = "0.0.1"
-source = "git+https://github.com/Project-Robius-China/makepad-shell.git?branch=main#37591a7afcc8e48c5b71a758aae61a6ab7fcc0b4"
+source = "git+https://github.com/Project-Robius-China/makepad-shell.git?branch=main#bf7e3dda3e54c6b2efb820c3a76baa10293db556"
 dependencies = [
  "makepad-shell-core",
  "objc2",

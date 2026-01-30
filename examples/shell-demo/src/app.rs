@@ -18,53 +18,96 @@ struct ShellCommandAction(CommandId);
 
 live_design! {
     use link::theme::*;
+    use link::shaders::*;
     use link::widgets::*;
+    use makepad_components::modal::*;
+    use makepad_components::theme::colors::*;
 
     App = {{App}} {
         ui: <Root> {
             main_window = <Window> {
-                window: {title: "Makepad Component Shell Demo"}
-                body = <View> {
-                    width: Fill,
-                    height: Fill,
-                    flow: Down,
-                    align: {x: 0.5, y: 0.5},
-                    spacing: 12,
-                    show_bg: true,
-                    draw_bg: {
-                        color: #2b2b2b
-                    }
-
-                    <Label> {
-                        draw_text: {color: #fff}
-                        text: "App Menu / Tray / Context Menu demo (macOS)"
-                    }
-
-                    status_label = <Label> {
-                        draw_text: {color: #9}
-                        text: "Last command: (none)"
-                    }
-                }
-            }
-
-            // About modal overlay
-            about_modal = <MpModalWidget> {
-                content = {
-                    dialog = <MpModal> {
-                        width: 360,
-                        header = {
-                            title = { text: "About Shell Demo" }
+                window: {inner_size: vec2(1280, 800), title: "Makepad Component Shell Demo"},
+                caption_bar = {
+                    caption_label = {
+                        label = {
+                            margin: {left: 65},
+                            align: {x: 0.5},
+                            text: "Makepad Component Shell",
                         }
-                        body = {
-                            about_version = <Label> {
-                                width: Fill,
-                                height: Fit,
-                                draw_text: {
-                                    text_style: <THEME_FONT_REGULAR>{ font_size: 14.0 }
-                                    color: (MUTED_FOREGROUND)
-                                    wrap: Word
+                    }
+                    windows_buttons = {
+                        // Note: these are the background colors of the buttons used in Windows:
+                        // * idle: Clear, for all three buttons.
+                        // * hover: #E9E9E9 for minimize and maximize, #E81123 for close.
+                        // * down: either darker (on light mode) or lighter (on dark mode).
+                        //
+                        // However, the DesktopButton widget doesn't support drawing a background color yet,
+                        // so these colors are the colors of the icon itself, not the background highlight.
+                        // When it supports that, we will keep the icon color always black,
+                        // and change the background color instead based on the above colors.
+                        min   = { draw_bg: {color: #0, color_hover: #9, color_down: #3} }
+                        max   = { draw_bg: {color: #0, color_hover: #9, color_down: #3} }
+                        close = { draw_bg: {color: #0, color_hover: #E81123, color_down: #FF0015} }
+                    }
+                    draw_bg: {color: #F3F3F3},
+                }
+                
+                body = <View> {
+                    padding: 0,
+                    
+                    <View> {
+                        width: Fill, height: Fill,
+                        flow: Overlay,
+                        show_bg: true,
+                        draw_bg: {
+                            color: #2b2b2b
+                        }
+    
+                        <View> {
+                            width: Fill, height: Fill,
+                            spacing: 16,
+                            flow: Down,
+                            align: { x: 0.5, y: 0.5 },
+                            <Label> {
+                                draw_text: {color: #fff}
+                                text: "App Menu / Tray / Context Menu demo (macOS)"
+                            }
+        
+                            status_label = <Label> {
+                                draw_text: {color: #9}
+                                text: "Last command: (none)"
+                            }
+                        }
+                        
+                        // About modal overlay
+                        about_modal = <MpModalWidget> {
+                            backdrop = {
+                                show_bg: false
+                            }
+                            content = {
+                                dialog = <MpModal> {
+                                    width: 400,
+                                    header = {
+                                        title = { text: "About Makepad Shell Demo" }
+                                    }
+                                    body = <View> {
+                                        width: Fill,
+                                        height: Fit,
+                                        padding: { left: 24, right: 24, top: 0, bottom: 16 },
+                                        flow: Down,
+                                        spacing: 8,
+                                        about_version = <Label> {
+                                            width: Fill,
+                                            height: Fit,
+                                            draw_text: {
+                                                text_style: <THEME_FONT_REGULAR>{ font_size: 14.0 }
+                                                wrap: Word
+                                                color: (MUTED_FOREGROUND)
+                                            }
+                                            text: "Version:"
+                                        }
+                                    }
                                 }
-                                text: "Version:"
                             }
                         }
                     }
@@ -184,7 +227,7 @@ impl App {
                 }
             }
             CMD_ABOUT => {
-                let text = format!("Makepad Shell Demo\nVersion: {}", APP_VERSION);
+                let text = format!("Version: {}", APP_VERSION);
                 self.ui.label(ids!(about_version)).set_text(cx, &text);
                 self.ui.mp_modal_widget(ids!(about_modal)).open(cx);
                 self.last_event = Some(format!("About (v{})", APP_VERSION));
