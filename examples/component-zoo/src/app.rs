@@ -2,6 +2,7 @@ use makepad_widgets::*;
 use makepad_components::avatar::MpAvatarWidgetRefExt;
 use makepad_components::badge::MpBadgeWidgetRefExt;
 use makepad_components::button::MpButtonWidgetRefExt;
+use makepad_components::calendar::MpCalendarAction;
 use makepad_components::card::MpCardAction;
 use makepad_components::checkbox::MpCheckboxWidgetRefExt;
 use makepad_components::modal::MpModalAction;
@@ -25,6 +26,7 @@ live_design! {
     use makepad_components::avatar::*;
     use makepad_components::badge::*;
     use makepad_components::button::*;
+    use makepad_components::calendar::*;
     use makepad_components::card::*;
     use makepad_components::checkbox::*;
     use makepad_components::divider::*;
@@ -3228,6 +3230,42 @@ live_design! {
 
                             <MpDivider> {}
 
+                            // ===== Calendar Section =====
+                            <View> {
+                                width: Fill, height: Fit,
+                                flow: Down,
+                                spacing: 16,
+
+                                <SectionHeader> { text: "Calendar" }
+
+                                <View> {
+                                    width: Fit, height: Fit,
+                                    flow: Right,
+                                    spacing: 24,
+
+                                    // Basic Calendar
+                                    <View> {
+                                        width: Fit, height: Fit,
+                                        flow: Down,
+                                        spacing: 8,
+
+                                        <SubsectionLabel> { text: "Basic" }
+
+                                        calendar1 = <MpCalendar> {}
+                                    }
+                                }
+
+                                calendar_status = <Label> {
+                                    draw_text: {
+                                        text_style: <THEME_FONT_REGULAR>{ font_size: 12.0 }
+                                        color: (MUTED_FOREGROUND)
+                                    }
+                                    text: "Selected: None"
+                                }
+                            }
+
+                            <MpDivider> {}
+
                             // ===== Interactive Demo =====
                             <View> {
                                 width: Fit, height: Fit,
@@ -3364,6 +3402,14 @@ impl MatchEvent for App {
             self.counter += 1;
             self.ui.label(ids!(counter_label))
                 .set_text(cx, &format!("Clicked: {} times", self.counter));
+        }
+
+        // Handle Calendar date selection
+        for action in actions {
+            if let MpCalendarAction::DateSelected(date) = action.as_widget_action().cast() {
+                self.ui.label(ids!(calendar_status))
+                    .set_text(cx, &format!("Selected: {}-{:02}-{:02}", date.year, date.month, date.day));
+            }
         }
 
         // Handle PageFlip navigation

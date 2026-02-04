@@ -7,33 +7,47 @@ live_design! {
 
     use crate::theme::colors::*;
 
-    // Calendar Day Cell
-    CalendarDayCell = {{CalendarDayCell}} {
+    // Week day label
+    CalendarWeekLabel = <View> {
+        width: 36.0,
+        height: 28.0,
+        align: { x: 0.5, y: 0.5 }
+
+        label = <Label> {
+            width: Fit,
+            height: Fit,
+            draw_text: {
+                text_style: <THEME_FONT_REGULAR>{ font_size: 12.0 }
+                color: (MUTED_FOREGROUND)
+            }
+        }
+    }
+
+    // Day cell button
+    CalendarDayButton = <View> {
         width: 36.0,
         height: 36.0,
         align: { x: 0.5, y: 0.5 }
 
+        show_bg: true
         draw_bg: {
             instance radius: 18.0
             instance hover: 0.0
             instance selected: 0.0
-            instance in_range: 0.0
             instance is_today: 0.0
-            instance disabled: 0.0
+            instance is_other_month: 0.0
             instance color: (TRANSPARENT)
             instance color_hover: (SECONDARY)
             instance color_selected: (PRIMARY)
-            instance color_in_range: (SECONDARY)
             instance color_today_border: (PRIMARY)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
                 let center = self.rect_size * 0.5;
 
-                sdf.circle(center.x, center.y, self.radius);
+                sdf.circle(center.x, center.y, self.radius - 1.0);
 
                 let bg_color = mix(self.color, self.color_hover, self.hover);
-                let bg_color = mix(bg_color, self.color_in_range, self.in_range);
                 let bg_color = mix(bg_color, self.color_selected, self.selected);
 
                 sdf.fill_keep(bg_color);
@@ -46,67 +60,24 @@ live_design! {
             }
         }
 
-        draw_text: {
-            text_style: <THEME_FONT_REGULAR>{ font_size: 13.0 }
-            instance color: (FOREGROUND)
-            instance color_disabled: (MUTED_FOREGROUND)
-            instance color_selected: (PRIMARY_FOREGROUND)
-            instance disabled: 0.0
-            instance selected: 0.0
-
-            fn get_color(self) -> vec4 {
-                if self.selected > 0.5 {
-                    return self.color_selected;
-                }
-                if self.disabled > 0.5 {
-                    return self.color_disabled;
-                }
-                return self.color;
-            }
-        }
-
-        text: ""
-
-        animator: {
-            hover = {
-                default: off
-                off = {
-                    from: { all: Forward { duration: 0.1 } }
-                    apply: { draw_bg: { hover: 0.0 } }
-                }
-                on = {
-                    from: { all: Forward { duration: 0.1 } }
-                    apply: { draw_bg: { hover: 1.0 } }
-                }
+        label = <Label> {
+            width: Fit,
+            height: Fit,
+            draw_text: {
+                text_style: <THEME_FONT_REGULAR>{ font_size: 13.0 }
+                color: (FOREGROUND)
             }
         }
     }
 
-    // Calendar Week Header
-    CalendarWeekHeader = <View> {
-        width: Fill,
-        height: Fit,
-        flow: Right,
-        spacing: 4.0,
-        align: { x: 0.5, y: 0.5 }
-    }
-
-    CalendarWeekLabel = <Label> {
-        width: 36.0,
-        height: 24.0,
-        align: { x: 0.5, y: 0.5 }
-        draw_text: {
-            text_style: <THEME_FONT_REGULAR>{ font_size: 12.0 }
-            color: (MUTED_FOREGROUND)
-        }
-    }
-
-    // Calendar Navigation Button
-    CalendarNavButton = {{CalendarNavButton}} {
+    // Navigation button
+    CalendarNavButton = <View> {
         width: 32.0,
         height: 32.0,
         align: { x: 0.5, y: 0.5 }
+        cursor: Hand
 
+        show_bg: true
         draw_bg: {
             instance radius: 6.0
             instance hover: 0.0
@@ -115,102 +86,65 @@ live_design! {
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
-                sdf.box(
-                    0.0,
-                    0.0,
-                    self.rect_size.x,
-                    self.rect_size.y,
-                    self.radius
-                );
+                sdf.box(0.0, 0.0, self.rect_size.x, self.rect_size.y, self.radius);
                 let bg_color = mix(self.color, self.color_hover, self.hover);
                 sdf.fill(bg_color);
                 return sdf.result;
             }
         }
 
-        draw_icon: {
-            instance color: (FOREGROUND)
-            fn get_color(self) -> vec4 {
-                return self.color;
-            }
-        }
-
-        icon_walk: { width: 16.0, height: 16.0 }
-
-        animator: {
-            hover = {
-                default: off
-                off = {
-                    from: { all: Forward { duration: 0.1 } }
-                    apply: { draw_bg: { hover: 0.0 } }
-                }
-                on = {
-                    from: { all: Forward { duration: 0.1 } }
-                    apply: { draw_bg: { hover: 1.0 } }
-                }
+        label = <Label> {
+            width: Fit,
+            height: Fit,
+            draw_text: {
+                text_style: <THEME_FONT_BOLD>{ font_size: 16.0 }
+                color: (FOREGROUND)
             }
         }
     }
 
-    // Month/Year Selector Button
-    CalendarSelectorButton = {{CalendarSelectorButton}} {
+    // Month/Year selector button
+    CalendarSelectorButton = <View> {
         width: Fit,
         height: 32.0,
         padding: { left: 8.0, right: 8.0 }
         align: { x: 0.5, y: 0.5 }
+        cursor: Hand
 
+        show_bg: true
         draw_bg: {
             instance radius: 6.0
             instance hover: 0.0
-            instance selected: 0.0
             instance color: (TRANSPARENT)
             instance color_hover: (SECONDARY)
-            instance color_selected: (SECONDARY_ACTIVE)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
-                sdf.box(
-                    0.0,
-                    0.0,
-                    self.rect_size.x,
-                    self.rect_size.y,
-                    self.radius
-                );
+                sdf.box(0.0, 0.0, self.rect_size.x, self.rect_size.y, self.radius);
                 let bg_color = mix(self.color, self.color_hover, self.hover);
-                let bg_color = mix(bg_color, self.color_selected, self.selected);
                 sdf.fill(bg_color);
                 return sdf.result;
             }
         }
 
-        draw_text: {
-            text_style: <THEME_FONT_BOLD>{ font_size: 14.0 }
-            color: (FOREGROUND)
-        }
-
-        text: ""
-
-        animator: {
-            hover = {
-                default: off
-                off = {
-                    from: { all: Forward { duration: 0.1 } }
-                    apply: { draw_bg: { hover: 0.0 } }
-                }
-                on = {
-                    from: { all: Forward { duration: 0.1 } }
-                    apply: { draw_bg: { hover: 1.0 } }
-                }
+        label = <Label> {
+            width: Fit,
+            height: Fit,
+            draw_text: {
+                text_style: <THEME_FONT_BOLD>{ font_size: 14.0 }
+                color: (FOREGROUND)
             }
         }
     }
 
-    // Month Grid Item
-    CalendarMonthItem = {{CalendarMonthItem}} {
+    // Month item for month view
+    CalendarMonthButton = <View> {
         width: 70.0,
         height: 36.0,
         align: { x: 0.5, y: 0.5 }
+        cursor: Hand
 
+        show_bg: true
         draw_bg: {
             instance radius: 6.0
             instance hover: 0.0
@@ -221,13 +155,7 @@ live_design! {
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
-                sdf.box(
-                    0.0,
-                    0.0,
-                    self.rect_size.x,
-                    self.rect_size.y,
-                    self.radius
-                );
+                sdf.box(0.0, 0.0, self.rect_size.x, self.rect_size.y, self.radius);
                 let bg_color = mix(self.color, self.color_hover, self.hover);
                 let bg_color = mix(bg_color, self.color_selected, self.selected);
                 sdf.fill(bg_color);
@@ -235,43 +163,24 @@ live_design! {
             }
         }
 
-        draw_text: {
-            text_style: <THEME_FONT_REGULAR>{ font_size: 13.0 }
-            instance color: (FOREGROUND)
-            instance color_selected: (PRIMARY_FOREGROUND)
-            instance selected: 0.0
-
-            fn get_color(self) -> vec4 {
-                if self.selected > 0.5 {
-                    return self.color_selected;
-                }
-                return self.color;
-            }
-        }
-
-        text: ""
-
-        animator: {
-            hover = {
-                default: off
-                off = {
-                    from: { all: Forward { duration: 0.1 } }
-                    apply: { draw_bg: { hover: 0.0 } }
-                }
-                on = {
-                    from: { all: Forward { duration: 0.1 } }
-                    apply: { draw_bg: { hover: 1.0 } }
-                }
+        label = <Label> {
+            width: Fit,
+            height: Fit,
+            draw_text: {
+                text_style: <THEME_FONT_REGULAR>{ font_size: 13.0 }
+                color: (FOREGROUND)
             }
         }
     }
 
-    // Year Grid Item
-    CalendarYearItem = {{CalendarYearItem}} {
+    // Year item for year view
+    CalendarYearButton = <View> {
         width: 56.0,
         height: 36.0,
         align: { x: 0.5, y: 0.5 }
+        cursor: Hand
 
+        show_bg: true
         draw_bg: {
             instance radius: 6.0
             instance hover: 0.0
@@ -282,13 +191,7 @@ live_design! {
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
-                sdf.box(
-                    0.0,
-                    0.0,
-                    self.rect_size.x,
-                    self.rect_size.y,
-                    self.radius
-                );
+                sdf.box(0.0, 0.0, self.rect_size.x, self.rect_size.y, self.radius);
                 let bg_color = mix(self.color, self.color_hover, self.hover);
                 let bg_color = mix(bg_color, self.color_selected, self.selected);
                 sdf.fill(bg_color);
@@ -296,33 +199,12 @@ live_design! {
             }
         }
 
-        draw_text: {
-            text_style: <THEME_FONT_REGULAR>{ font_size: 13.0 }
-            instance color: (FOREGROUND)
-            instance color_selected: (PRIMARY_FOREGROUND)
-            instance selected: 0.0
-
-            fn get_color(self) -> vec4 {
-                if self.selected > 0.5 {
-                    return self.color_selected;
-                }
-                return self.color;
-            }
-        }
-
-        text: ""
-
-        animator: {
-            hover = {
-                default: off
-                off = {
-                    from: { all: Forward { duration: 0.1 } }
-                    apply: { draw_bg: { hover: 0.0 } }
-                }
-                on = {
-                    from: { all: Forward { duration: 0.1 } }
-                    apply: { draw_bg: { hover: 1.0 } }
-                }
+        label = <Label> {
+            width: Fit,
+            height: Fit,
+            draw_text: {
+                text_style: <THEME_FONT_REGULAR>{ font_size: 13.0 }
+                color: (FOREGROUND)
             }
         }
     }
@@ -335,6 +217,7 @@ live_design! {
         padding: 16.0,
         spacing: 8.0,
 
+        show_bg: true
         draw_bg: {
             instance radius: 8.0
             instance border_width: 1.0
@@ -356,102 +239,184 @@ live_design! {
             }
         }
 
-        show_bg: true
+        // Header with navigation
+        header = <View> {
+            width: Fill,
+            height: Fit,
+            flow: Right,
+            spacing: 8.0,
+            align: { x: 0.5, y: 0.5 }
+
+            prev_btn = <CalendarNavButton> {
+                label = { text: "<" }
+            }
+
+            <View> { width: Fill, height: 1.0 }
+
+            month_btn = <CalendarSelectorButton> {
+                label = { text: "February" }
+            }
+
+            year_btn = <CalendarSelectorButton> {
+                label = { text: "2026" }
+            }
+
+            <View> { width: Fill, height: 1.0 }
+
+            next_btn = <CalendarNavButton> {
+                label = { text: ">" }
+            }
+        }
+
+        // Days view container
+        days_view = <View> {
+            width: Fit,
+            height: Fit,
+            flow: Down,
+            spacing: 4.0,
+            visible: true
+
+            // Week header row
+            week_header = <View> {
+                width: Fit,
+                height: Fit,
+                flow: Right,
+                spacing: 4.0,
+
+                sun = <CalendarWeekLabel> { label = { text: "Su" } }
+                mon = <CalendarWeekLabel> { label = { text: "Mo" } }
+                tue = <CalendarWeekLabel> { label = { text: "Tu" } }
+                wed = <CalendarWeekLabel> { label = { text: "We" } }
+                thu = <CalendarWeekLabel> { label = { text: "Th" } }
+                fri = <CalendarWeekLabel> { label = { text: "Fr" } }
+                sat = <CalendarWeekLabel> { label = { text: "Sa" } }
+            }
+
+            // Week rows (5 weeks)
+            week0 = <View> {
+                width: Fit, height: Fit, flow: Right, spacing: 4.0
+                d0 = <CalendarDayButton> {} d1 = <CalendarDayButton> {} d2 = <CalendarDayButton> {}
+                d3 = <CalendarDayButton> {} d4 = <CalendarDayButton> {} d5 = <CalendarDayButton> {}
+                d6 = <CalendarDayButton> {}
+            }
+            week1 = <View> {
+                width: Fit, height: Fit, flow: Right, spacing: 4.0
+                d0 = <CalendarDayButton> {} d1 = <CalendarDayButton> {} d2 = <CalendarDayButton> {}
+                d3 = <CalendarDayButton> {} d4 = <CalendarDayButton> {} d5 = <CalendarDayButton> {}
+                d6 = <CalendarDayButton> {}
+            }
+            week2 = <View> {
+                width: Fit, height: Fit, flow: Right, spacing: 4.0
+                d0 = <CalendarDayButton> {} d1 = <CalendarDayButton> {} d2 = <CalendarDayButton> {}
+                d3 = <CalendarDayButton> {} d4 = <CalendarDayButton> {} d5 = <CalendarDayButton> {}
+                d6 = <CalendarDayButton> {}
+            }
+            week3 = <View> {
+                width: Fit, height: Fit, flow: Right, spacing: 4.0
+                d0 = <CalendarDayButton> {} d1 = <CalendarDayButton> {} d2 = <CalendarDayButton> {}
+                d3 = <CalendarDayButton> {} d4 = <CalendarDayButton> {} d5 = <CalendarDayButton> {}
+                d6 = <CalendarDayButton> {}
+            }
+            week4 = <View> {
+                width: Fit, height: Fit, flow: Right, spacing: 4.0
+                d0 = <CalendarDayButton> {} d1 = <CalendarDayButton> {} d2 = <CalendarDayButton> {}
+                d3 = <CalendarDayButton> {} d4 = <CalendarDayButton> {} d5 = <CalendarDayButton> {}
+                d6 = <CalendarDayButton> {}
+            }
+        }
+
+        // Months view container
+        months_view = <View> {
+            width: Fit,
+            height: Fit,
+            flow: Down,
+            spacing: 8.0,
+            visible: false
+
+            row0 = <View> {
+                width: Fit, height: Fit, flow: Right, spacing: 8.0
+                m0 = <CalendarMonthButton> { label = { text: "Jan" } }
+                m1 = <CalendarMonthButton> { label = { text: "Feb" } }
+                m2 = <CalendarMonthButton> { label = { text: "Mar" } }
+            }
+            row1 = <View> {
+                width: Fit, height: Fit, flow: Right, spacing: 8.0
+                m3 = <CalendarMonthButton> { label = { text: "Apr" } }
+                m4 = <CalendarMonthButton> { label = { text: "May" } }
+                m5 = <CalendarMonthButton> { label = { text: "Jun" } }
+            }
+            row2 = <View> {
+                width: Fit, height: Fit, flow: Right, spacing: 8.0
+                m6 = <CalendarMonthButton> { label = { text: "Jul" } }
+                m7 = <CalendarMonthButton> { label = { text: "Aug" } }
+                m8 = <CalendarMonthButton> { label = { text: "Sep" } }
+            }
+            row3 = <View> {
+                width: Fit, height: Fit, flow: Right, spacing: 8.0
+                m9 = <CalendarMonthButton> { label = { text: "Oct" } }
+                m10 = <CalendarMonthButton> { label = { text: "Nov" } }
+                m11 = <CalendarMonthButton> { label = { text: "Dec" } }
+            }
+        }
+
+        // Years view container
+        years_view = <View> {
+            width: Fit,
+            height: Fit,
+            flow: Down,
+            spacing: 8.0,
+            visible: false
+
+            row0 = <View> {
+                width: Fit, height: Fit, flow: Right, spacing: 8.0
+                y0 = <CalendarYearButton> {} y1 = <CalendarYearButton> {}
+                y2 = <CalendarYearButton> {} y3 = <CalendarYearButton> {}
+            }
+            row1 = <View> {
+                width: Fit, height: Fit, flow: Right, spacing: 8.0
+                y4 = <CalendarYearButton> {} y5 = <CalendarYearButton> {}
+                y6 = <CalendarYearButton> {} y7 = <CalendarYearButton> {}
+            }
+            row2 = <View> {
+                width: Fit, height: Fit, flow: Right, spacing: 8.0
+                y8 = <CalendarYearButton> {} y9 = <CalendarYearButton> {}
+                y10 = <CalendarYearButton> {} y11 = <CalendarYearButton> {}
+            }
+            row3 = <View> {
+                width: Fit, height: Fit, flow: Right, spacing: 8.0
+                y12 = <CalendarYearButton> {} y13 = <CalendarYearButton> {}
+                y14 = <CalendarYearButton> {} y15 = <CalendarYearButton> {}
+            }
+            row4 = <View> {
+                width: Fit, height: Fit, flow: Right, spacing: 8.0
+                y16 = <CalendarYearButton> {} y17 = <CalendarYearButton> {}
+                y18 = <CalendarYearButton> {} y19 = <CalendarYearButton> {}
+            }
+        }
     }
 }
 
 // ============================================================================
-// Date Types
+// Date Types and Utilities
 // ============================================================================
 
 /// Represents a calendar date selection
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CalendarDate {
-    /// Single date selection
-    Single(Option<(i32, u32, u32)>), // (year, month, day)
-    /// Date range selection
-    Range(Option<(i32, u32, u32)>, Option<(i32, u32, u32)>),
-}
-
-impl Default for CalendarDate {
-    fn default() -> Self {
-        Self::Single(None)
-    }
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct CalendarDate {
+    pub year: i32,
+    pub month: u32,
+    pub day: u32,
 }
 
 impl CalendarDate {
-    /// Create a single date
-    pub fn single(year: i32, month: u32, day: u32) -> Self {
-        Self::Single(Some((year, month, day)))
+    pub fn new(year: i32, month: u32, day: u32) -> Self {
+        Self { year, month, day }
     }
 
-    /// Create a date range
-    pub fn range(start: (i32, u32, u32), end: (i32, u32, u32)) -> Self {
-        Self::Range(Some(start), Some(end))
-    }
-
-    /// Check if date is set
-    pub fn is_some(&self) -> bool {
-        match self {
-            Self::Single(Some(_)) | Self::Range(Some(_), _) => true,
-            _ => false,
-        }
-    }
-
-    /// Check if date selection is complete
-    pub fn is_complete(&self) -> bool {
-        match self {
-            Self::Single(Some(_)) => true,
-            Self::Range(Some(_), Some(_)) => true,
-            _ => false,
-        }
-    }
-
-    /// Get start date
-    pub fn start(&self) -> Option<(i32, u32, u32)> {
-        match self {
-            Self::Single(d) => *d,
-            Self::Range(start, _) => *start,
-        }
-    }
-
-    /// Get end date (for range)
-    pub fn end(&self) -> Option<(i32, u32, u32)> {
-        match self {
-            Self::Range(_, end) => *end,
-            _ => None,
-        }
-    }
-
-    #[allow(dead_code)]
-    fn is_single(&self) -> bool {
-        matches!(self, Self::Single(_))
-    }
-
-    #[allow(dead_code)]
-    fn is_active(&self, year: i32, month: u32, day: u32) -> bool {
-        let date = (year, month, day);
-        match self {
-            Self::Single(d) => *d == Some(date),
-            Self::Range(start, end) => *start == Some(date) || *end == Some(date),
-        }
-    }
-
-    #[allow(dead_code)]
-    fn is_in_range(&self, year: i32, month: u32, day: u32) -> bool {
-        match self {
-            Self::Range(Some(start), Some(end)) => {
-                let date = (year, month, day);
-                date > *start && date < *end
-            }
-            _ => false,
-        }
+    pub fn is_valid(&self) -> bool {
+        self.year > 0 && self.month >= 1 && self.month <= 12 && self.day >= 1 && self.day <= 31
     }
 }
-
-// ============================================================================
-// View Mode
-// ============================================================================
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum CalendarViewMode {
@@ -461,16 +426,10 @@ pub enum CalendarViewMode {
     Year,
 }
 
-// ============================================================================
-// Date Utilities
-// ============================================================================
-
-#[allow(dead_code)]
 fn is_leap_year(year: i32) -> bool {
     year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
 }
 
-#[allow(dead_code)]
 fn days_in_month(year: i32, month: u32) -> u32 {
     match month {
         1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
@@ -480,499 +439,28 @@ fn days_in_month(year: i32, month: u32) -> u32 {
     }
 }
 
-#[allow(dead_code)]
 fn weekday_of_first(year: i32, month: u32) -> u32 {
     // Zeller's congruence for Gregorian calendar
     let m = if month < 3 { month as i32 + 12 } else { month as i32 };
     let y = if month < 3 { year - 1 } else { year };
-    let q: i32 = 1; // first day
+    let q: i32 = 1;
     let k = y % 100;
     let j = y / 100;
 
     let h = (q + (13 * (m + 1)) / 5 + k + k / 4 + j / 4 - 2 * j) % 7;
-    // Convert to Sunday = 0
     ((h + 6) % 7) as u32
 }
 
-/// Get current date (year, month, day)
 fn get_today() -> (i32, u32, u32) {
-    // Use a simple approach - in real app you'd use chrono or similar
-    // For now, default to a reasonable date
     (2026, 2, 4)
 }
 
-#[allow(dead_code)]
 fn month_name(month: u32) -> &'static str {
     match month {
-        1 => "January",
-        2 => "February",
-        3 => "March",
-        4 => "April",
-        5 => "May",
-        6 => "June",
-        7 => "July",
-        8 => "August",
-        9 => "September",
-        10 => "October",
-        11 => "November",
-        12 => "December",
+        1 => "January", 2 => "February", 3 => "March", 4 => "April",
+        5 => "May", 6 => "June", 7 => "July", 8 => "August",
+        9 => "September", 10 => "October", 11 => "November", 12 => "December",
         _ => "",
-    }
-}
-
-fn month_name_short(month: u32) -> &'static str {
-    match month {
-        1 => "Jan",
-        2 => "Feb",
-        3 => "Mar",
-        4 => "Apr",
-        5 => "May",
-        6 => "Jun",
-        7 => "Jul",
-        8 => "Aug",
-        9 => "Sep",
-        10 => "Oct",
-        11 => "Nov",
-        12 => "Dec",
-        _ => "",
-    }
-}
-
-#[allow(dead_code)]
-const WEEK_DAYS: [&str; 7] = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
-
-// ============================================================================
-// Calendar Day Cell Widget
-// ============================================================================
-
-#[derive(Live, LiveHook, Widget)]
-pub struct CalendarDayCell {
-    #[redraw]
-    #[live]
-    draw_bg: DrawQuad,
-    #[live]
-    draw_text: DrawText,
-    #[walk]
-    walk: Walk,
-    #[layout]
-    layout: Layout,
-
-    #[live]
-    text: ArcStringMut,
-
-    #[animator]
-    animator: Animator,
-
-    #[rust]
-    area: Area,
-
-    // Cell state
-    #[rust]
-    pub day: u32,
-    #[rust]
-    pub month: u32,
-    #[rust]
-    pub year: i32,
-    #[rust]
-    pub is_current_month: bool,
-    #[rust]
-    pub is_selected: bool,
-    #[rust]
-    pub is_in_range: bool,
-    #[rust]
-    pub is_today: bool,
-    #[rust]
-    pub is_disabled: bool,
-}
-
-#[derive(Clone, Debug, DefaultNone)]
-pub enum CalendarDayCellAction {
-    Clicked(i32, u32, u32), // year, month, day
-    None,
-}
-
-impl Widget for CalendarDayCell {
-    fn handle_event(&mut self, cx: &mut Cx, event: &Event, scope: &mut Scope) {
-        let uid = self.widget_uid();
-
-        if self.animator_handle_event(cx, event).must_redraw() {
-            self.redraw(cx);
-        }
-
-        if self.is_disabled {
-            return;
-        }
-
-        match event.hits(cx, self.area) {
-            Hit::FingerHoverIn(_) => {
-                cx.set_cursor(MouseCursor::Hand);
-                self.animator_play(cx, ids!(hover.on));
-            }
-            Hit::FingerHoverOut(_) => {
-                cx.set_cursor(MouseCursor::Default);
-                self.animator_play(cx, ids!(hover.off));
-            }
-            Hit::FingerUp(fe) => {
-                if fe.is_over {
-                    cx.widget_action(
-                        uid,
-                        &scope.path,
-                        CalendarDayCellAction::Clicked(self.year, self.month, self.day),
-                    );
-                }
-            }
-            _ => {}
-        }
-    }
-
-    fn draw_walk(&mut self, cx: &mut Cx2d, _scope: &mut Scope, walk: Walk) -> DrawStep {
-        // Update shader uniforms
-        self.draw_bg.apply_over(cx, live! {
-            selected: (if self.is_selected { 1.0 } else { 0.0 }),
-            in_range: (if self.is_in_range { 1.0 } else { 0.0 }),
-            is_today: (if self.is_today { 1.0 } else { 0.0 }),
-            disabled: (if self.is_disabled || !self.is_current_month { 1.0 } else { 0.0 }),
-        });
-
-        self.draw_text.apply_over(cx, live! {
-            selected: (if self.is_selected { 1.0 } else { 0.0 }),
-            disabled: (if self.is_disabled || !self.is_current_month { 1.0 } else { 0.0 }),
-        });
-
-        self.draw_bg.begin(cx, walk, self.layout);
-        self.draw_text.draw_walk(cx, Walk::fit(), Align::default(), self.text.as_ref());
-        self.draw_bg.end(cx);
-        self.area = self.draw_bg.area();
-        DrawStep::done()
-    }
-}
-
-impl CalendarDayCell {
-    pub fn set_day(&mut self, year: i32, month: u32, day: u32, is_current_month: bool) {
-        self.year = year;
-        self.month = month;
-        self.day = day;
-        self.is_current_month = is_current_month;
-        self.text.as_mut_empty().push_str(&day.to_string());
-    }
-}
-
-// ============================================================================
-// Calendar Navigation Button Widget
-// ============================================================================
-
-#[derive(Live, LiveHook, Widget)]
-pub struct CalendarNavButton {
-    #[redraw]
-    #[live]
-    draw_bg: DrawQuad,
-    #[live]
-    draw_icon: DrawIcon,
-    #[walk]
-    walk: Walk,
-    #[layout]
-    layout: Layout,
-
-    #[live]
-    icon_walk: Walk,
-
-    #[animator]
-    animator: Animator,
-
-    #[rust]
-    area: Area,
-}
-
-#[derive(Clone, Debug, DefaultNone)]
-pub enum CalendarNavButtonAction {
-    Clicked,
-    None,
-}
-
-impl Widget for CalendarNavButton {
-    fn handle_event(&mut self, cx: &mut Cx, event: &Event, scope: &mut Scope) {
-        let uid = self.widget_uid();
-
-        if self.animator_handle_event(cx, event).must_redraw() {
-            self.redraw(cx);
-        }
-
-        match event.hits(cx, self.area) {
-            Hit::FingerHoverIn(_) => {
-                cx.set_cursor(MouseCursor::Hand);
-                self.animator_play(cx, ids!(hover.on));
-            }
-            Hit::FingerHoverOut(_) => {
-                cx.set_cursor(MouseCursor::Default);
-                self.animator_play(cx, ids!(hover.off));
-            }
-            Hit::FingerUp(fe) => {
-                if fe.is_over {
-                    cx.widget_action(uid, &scope.path, CalendarNavButtonAction::Clicked);
-                }
-            }
-            _ => {}
-        }
-    }
-
-    fn draw_walk(&mut self, cx: &mut Cx2d, _scope: &mut Scope, walk: Walk) -> DrawStep {
-        self.draw_bg.begin(cx, walk, self.layout);
-        self.draw_icon.draw_walk(cx, self.icon_walk);
-        self.draw_bg.end(cx);
-        self.area = self.draw_bg.area();
-        DrawStep::done()
-    }
-}
-
-// ============================================================================
-// Calendar Selector Button Widget
-// ============================================================================
-
-#[derive(Live, LiveHook, Widget)]
-pub struct CalendarSelectorButton {
-    #[redraw]
-    #[live]
-    draw_bg: DrawQuad,
-    #[live]
-    draw_text: DrawText,
-    #[walk]
-    walk: Walk,
-    #[layout]
-    layout: Layout,
-
-    #[live]
-    text: ArcStringMut,
-
-    #[animator]
-    animator: Animator,
-
-    #[rust]
-    area: Area,
-
-    #[rust]
-    pub is_selected: bool,
-}
-
-#[derive(Clone, Debug, DefaultNone)]
-pub enum CalendarSelectorButtonAction {
-    Clicked,
-    None,
-}
-
-impl Widget for CalendarSelectorButton {
-    fn handle_event(&mut self, cx: &mut Cx, event: &Event, scope: &mut Scope) {
-        let uid = self.widget_uid();
-
-        if self.animator_handle_event(cx, event).must_redraw() {
-            self.redraw(cx);
-        }
-
-        match event.hits(cx, self.area) {
-            Hit::FingerHoverIn(_) => {
-                cx.set_cursor(MouseCursor::Hand);
-                self.animator_play(cx, ids!(hover.on));
-            }
-            Hit::FingerHoverOut(_) => {
-                cx.set_cursor(MouseCursor::Default);
-                self.animator_play(cx, ids!(hover.off));
-            }
-            Hit::FingerUp(fe) => {
-                if fe.is_over {
-                    cx.widget_action(uid, &scope.path, CalendarSelectorButtonAction::Clicked);
-                }
-            }
-            _ => {}
-        }
-    }
-
-    fn draw_walk(&mut self, cx: &mut Cx2d, _scope: &mut Scope, walk: Walk) -> DrawStep {
-        self.draw_bg.apply_over(cx, live! {
-            selected: (if self.is_selected { 1.0 } else { 0.0 }),
-        });
-
-        self.draw_bg.begin(cx, walk, self.layout);
-        self.draw_text.draw_walk(cx, Walk::fit(), Align::default(), self.text.as_ref());
-        self.draw_bg.end(cx);
-        self.area = self.draw_bg.area();
-        DrawStep::done()
-    }
-}
-
-impl CalendarSelectorButton {
-    pub fn set_text(&mut self, text: &str) {
-        self.text.as_mut_empty().push_str(text);
-    }
-}
-
-// ============================================================================
-// Calendar Month Item Widget
-// ============================================================================
-
-#[derive(Live, LiveHook, Widget)]
-pub struct CalendarMonthItem {
-    #[redraw]
-    #[live]
-    draw_bg: DrawQuad,
-    #[live]
-    draw_text: DrawText,
-    #[walk]
-    walk: Walk,
-    #[layout]
-    layout: Layout,
-
-    #[live]
-    text: ArcStringMut,
-
-    #[animator]
-    animator: Animator,
-
-    #[rust]
-    area: Area,
-
-    #[rust]
-    pub month: u32,
-    #[rust]
-    pub is_selected: bool,
-}
-
-#[derive(Clone, Debug, DefaultNone)]
-pub enum CalendarMonthItemAction {
-    Clicked(u32), // month
-    None,
-}
-
-impl Widget for CalendarMonthItem {
-    fn handle_event(&mut self, cx: &mut Cx, event: &Event, scope: &mut Scope) {
-        let uid = self.widget_uid();
-
-        if self.animator_handle_event(cx, event).must_redraw() {
-            self.redraw(cx);
-        }
-
-        match event.hits(cx, self.area) {
-            Hit::FingerHoverIn(_) => {
-                cx.set_cursor(MouseCursor::Hand);
-                self.animator_play(cx, ids!(hover.on));
-            }
-            Hit::FingerHoverOut(_) => {
-                cx.set_cursor(MouseCursor::Default);
-                self.animator_play(cx, ids!(hover.off));
-            }
-            Hit::FingerUp(fe) => {
-                if fe.is_over {
-                    cx.widget_action(uid, &scope.path, CalendarMonthItemAction::Clicked(self.month));
-                }
-            }
-            _ => {}
-        }
-    }
-
-    fn draw_walk(&mut self, cx: &mut Cx2d, _scope: &mut Scope, walk: Walk) -> DrawStep {
-        self.draw_bg.apply_over(cx, live! {
-            selected: (if self.is_selected { 1.0 } else { 0.0 }),
-        });
-        self.draw_text.apply_over(cx, live! {
-            selected: (if self.is_selected { 1.0 } else { 0.0 }),
-        });
-
-        self.draw_bg.begin(cx, walk, self.layout);
-        self.draw_text.draw_walk(cx, Walk::fit(), Align::default(), self.text.as_ref());
-        self.draw_bg.end(cx);
-        self.area = self.draw_bg.area();
-        DrawStep::done()
-    }
-}
-
-impl CalendarMonthItem {
-    pub fn set_month(&mut self, month: u32) {
-        self.month = month;
-        self.text.as_mut_empty().push_str(month_name_short(month));
-    }
-}
-
-// ============================================================================
-// Calendar Year Item Widget
-// ============================================================================
-
-#[derive(Live, LiveHook, Widget)]
-pub struct CalendarYearItem {
-    #[redraw]
-    #[live]
-    draw_bg: DrawQuad,
-    #[live]
-    draw_text: DrawText,
-    #[walk]
-    walk: Walk,
-    #[layout]
-    layout: Layout,
-
-    #[live]
-    text: ArcStringMut,
-
-    #[animator]
-    animator: Animator,
-
-    #[rust]
-    area: Area,
-
-    #[rust]
-    pub year: i32,
-    #[rust]
-    pub is_selected: bool,
-}
-
-#[derive(Clone, Debug, DefaultNone)]
-pub enum CalendarYearItemAction {
-    Clicked(i32), // year
-    None,
-}
-
-impl Widget for CalendarYearItem {
-    fn handle_event(&mut self, cx: &mut Cx, event: &Event, scope: &mut Scope) {
-        let uid = self.widget_uid();
-
-        if self.animator_handle_event(cx, event).must_redraw() {
-            self.redraw(cx);
-        }
-
-        match event.hits(cx, self.area) {
-            Hit::FingerHoverIn(_) => {
-                cx.set_cursor(MouseCursor::Hand);
-                self.animator_play(cx, ids!(hover.on));
-            }
-            Hit::FingerHoverOut(_) => {
-                cx.set_cursor(MouseCursor::Default);
-                self.animator_play(cx, ids!(hover.off));
-            }
-            Hit::FingerUp(fe) => {
-                if fe.is_over {
-                    cx.widget_action(uid, &scope.path, CalendarYearItemAction::Clicked(self.year));
-                }
-            }
-            _ => {}
-        }
-    }
-
-    fn draw_walk(&mut self, cx: &mut Cx2d, _scope: &mut Scope, walk: Walk) -> DrawStep {
-        self.draw_bg.apply_over(cx, live! {
-            selected: (if self.is_selected { 1.0 } else { 0.0 }),
-        });
-        self.draw_text.apply_over(cx, live! {
-            selected: (if self.is_selected { 1.0 } else { 0.0 }),
-        });
-
-        self.draw_bg.begin(cx, walk, self.layout);
-        self.draw_text.draw_walk(cx, Walk::fit(), Align::default(), self.text.as_ref());
-        self.draw_bg.end(cx);
-        self.area = self.draw_bg.area();
-        DrawStep::done()
-    }
-}
-
-impl CalendarYearItem {
-    pub fn set_year(&mut self, year: i32) {
-        self.year = year;
-        self.text.as_mut_empty().push_str(&year.to_string());
     }
 }
 
@@ -982,18 +470,11 @@ impl CalendarYearItem {
 
 #[derive(Live, LiveHook, Widget)]
 pub struct MpCalendar {
-    #[redraw]
-    #[live]
-    draw_bg: DrawQuad,
-    #[walk]
-    walk: Walk,
-    #[layout]
-    layout: Layout,
+    #[deref]
+    view: View,
 
     #[rust]
-    area: Area,
-
-    // Calendar state
+    initialized: bool,
     #[rust]
     view_mode: CalendarViewMode,
     #[rust]
@@ -1001,77 +482,135 @@ pub struct MpCalendar {
     #[rust]
     current_month: u32,
     #[rust]
-    selected_date: CalendarDate,
+    selected_date: Option<CalendarDate>,
     #[rust]
     today: (i32, u32, u32),
     #[rust]
     year_page: i32,
-    #[rust]
-    year_range_start: i32,
-    #[rust]
-    year_range_end: i32,
-
-    // Selection mode
-    #[rust]
-    range_mode: bool,
 }
 
 #[derive(Clone, Debug, DefaultNone)]
 pub enum MpCalendarAction {
     DateSelected(CalendarDate),
+    MonthChanged(i32, u32),
     None,
 }
 
 impl Widget for MpCalendar {
-    fn handle_event(&mut self, cx: &mut Cx, _event: &Event, scope: &mut Scope) {
-        let uid = self.widget_uid();
-
-        // Handle day cell clicks
-        for action in cx.capture_actions(|_cx| {
-            // Process child widget actions
-        }) {
-            // Handle CalendarDayCellAction
-            if let CalendarDayCellAction::Clicked(year, month, day) = action.as_widget_action().cast() {
-                self.handle_day_click(year, month, day);
-                cx.widget_action(uid, &scope.path, MpCalendarAction::DateSelected(self.selected_date));
-                self.redraw(cx);
-            }
-            // Handle CalendarMonthItemAction
-            if let CalendarMonthItemAction::Clicked(month) = action.as_widget_action().cast() {
-                self.current_month = month;
-                self.view_mode = CalendarViewMode::Day;
-                self.redraw(cx);
-            }
-            // Handle CalendarYearItemAction
-            if let CalendarYearItemAction::Clicked(year) = action.as_widget_action().cast() {
-                self.current_year = year;
-                self.view_mode = CalendarViewMode::Day;
-                self.redraw(cx);
-            }
-        }
+    fn handle_event(&mut self, cx: &mut Cx, event: &Event, scope: &mut Scope) {
+        self.view.handle_event(cx, event, scope);
+        self.widget_match_event(cx, event, scope);
     }
 
     fn draw_walk(&mut self, cx: &mut Cx2d, scope: &mut Scope, walk: Walk) -> DrawStep {
-        // Initialize if needed
-        if self.current_year == 0 {
+        if !self.initialized {
             self.initialize();
         }
 
-        self.draw_bg.begin(cx, walk, self.layout);
+        // Update the UI before drawing
+        self.update_header(cx);
+        self.update_days_view(cx);
+        self.update_months_view(cx);
+        self.update_years_view(cx);
 
-        // Draw header
-        self.draw_header(cx, scope);
+        self.view.draw_walk(cx, scope, walk)
+    }
+}
 
-        // Draw content based on view mode
-        match self.view_mode {
-            CalendarViewMode::Day => self.draw_days_view(cx, scope),
-            CalendarViewMode::Month => self.draw_months_view(cx, scope),
-            CalendarViewMode::Year => self.draw_years_view(cx, scope),
+impl WidgetMatchEvent for MpCalendar {
+    fn handle_actions(&mut self, cx: &mut Cx, actions: &Actions, scope: &mut Scope) {
+        let uid = self.widget_uid();
+
+        // Handle prev button
+        if self.view.view(ids!(header.prev_btn)).finger_up(actions).is_some() {
+            match self.view_mode {
+                CalendarViewMode::Day => self.prev_month(),
+                CalendarViewMode::Year => self.prev_year_page(),
+                _ => {}
+            }
+            self.view.redraw(cx);
         }
 
-        self.draw_bg.end(cx);
-        self.area = self.draw_bg.area();
-        DrawStep::done()
+        // Handle next button
+        if self.view.view(ids!(header.next_btn)).finger_up(actions).is_some() {
+            match self.view_mode {
+                CalendarViewMode::Day => self.next_month(),
+                CalendarViewMode::Year => self.next_year_page(),
+                _ => {}
+            }
+            self.view.redraw(cx);
+        }
+
+        // Handle month button click
+        if self.view.view(ids!(header.month_btn)).finger_up(actions).is_some() {
+            self.view_mode = if self.view_mode == CalendarViewMode::Month {
+                CalendarViewMode::Day
+            } else {
+                CalendarViewMode::Month
+            };
+            self.update_view_visibility(cx);
+            self.view.redraw(cx);
+        }
+
+        // Handle year button click
+        if self.view.view(ids!(header.year_btn)).finger_up(actions).is_some() {
+            self.view_mode = if self.view_mode == CalendarViewMode::Year {
+                CalendarViewMode::Day
+            } else {
+                CalendarViewMode::Year
+            };
+            self.update_view_visibility(cx);
+            self.view.redraw(cx);
+        }
+
+        // Handle day clicks
+        for week in 0..5u32 {
+            for day in 0..7u32 {
+                let day_ids: &[LiveId] = &[
+                    LiveId::from_str("days_view"),
+                    LiveId::from_str(&format!("week{}", week)),
+                    LiveId::from_str(&format!("d{}", day)),
+                ];
+                if self.view.view(day_ids).finger_up(actions).is_some() {
+                    if let Some(date) = self.get_day_date(week, day) {
+                        self.selected_date = Some(date);
+                        cx.widget_action(uid, &scope.path, MpCalendarAction::DateSelected(date));
+                        self.view.redraw(cx);
+                    }
+                }
+            }
+        }
+
+        // Handle month item clicks
+        for m in 0..12u32 {
+            let month_ids: &[LiveId] = &[
+                LiveId::from_str("months_view"),
+                LiveId::from_str(&format!("row{}", m / 3)),
+                LiveId::from_str(&format!("m{}", m)),
+            ];
+            if self.view.view(month_ids).finger_up(actions).is_some() {
+                self.current_month = m + 1;
+                self.view_mode = CalendarViewMode::Day;
+                self.update_view_visibility(cx);
+                self.view.redraw(cx);
+            }
+        }
+
+        // Handle year item clicks
+        let start_year = self.today.0 - 10 + self.year_page * 20;
+        for y in 0..20u32 {
+            let year_ids: &[LiveId] = &[
+                LiveId::from_str("years_view"),
+                LiveId::from_str(&format!("row{}", y / 4)),
+                LiveId::from_str(&format!("y{}", y)),
+            ];
+            if self.view.view(year_ids).finger_up(actions).is_some() {
+                self.current_year = start_year + y as i32;
+                self.view_mode = CalendarViewMode::Day;
+                self.update_view_visibility(cx);
+                self.view.redraw(cx);
+            }
+        }
     }
 }
 
@@ -1080,35 +619,10 @@ impl MpCalendar {
         self.today = get_today();
         self.current_year = self.today.0;
         self.current_month = self.today.1;
-        self.year_range_start = self.today.0 - 50;
-        self.year_range_end = self.today.0 + 50;
-        self.year_page = (self.current_year - self.year_range_start) / 20;
+        self.year_page = 0;
+        self.initialized = true;
     }
 
-    fn handle_day_click(&mut self, year: i32, month: u32, day: u32) {
-        if self.range_mode {
-            match self.selected_date {
-                CalendarDate::Range(None, None) | CalendarDate::Single(_) | CalendarDate::Range(None, Some(_)) => {
-                    self.selected_date = CalendarDate::Range(Some((year, month, day)), None);
-                }
-                CalendarDate::Range(Some(start), None) => {
-                    let date = (year, month, day);
-                    if date < start {
-                        self.selected_date = CalendarDate::Range(Some(date), None);
-                    } else {
-                        self.selected_date = CalendarDate::Range(Some(start), Some(date));
-                    }
-                }
-                CalendarDate::Range(Some(_), Some(_)) => {
-                    self.selected_date = CalendarDate::Range(Some((year, month, day)), None);
-                }
-            }
-        } else {
-            self.selected_date = CalendarDate::Single(Some((year, month, day)));
-        }
-    }
-
-    #[allow(dead_code)]
     fn prev_month(&mut self) {
         if self.current_month == 1 {
             self.current_month = 12;
@@ -1118,7 +632,6 @@ impl MpCalendar {
         }
     }
 
-    #[allow(dead_code)]
     fn next_month(&mut self) {
         if self.current_month == 12 {
             self.current_month = 1;
@@ -1128,62 +641,184 @@ impl MpCalendar {
         }
     }
 
-    #[allow(dead_code)]
     fn prev_year_page(&mut self) {
-        if self.year_page > 0 {
+        if self.year_page > -5 {
             self.year_page -= 1;
         }
     }
 
-    #[allow(dead_code)]
-
     fn next_year_page(&mut self) {
-        let max_page = (self.year_range_end - self.year_range_start) / 20;
-        if self.year_page < max_page {
+        if self.year_page < 5 {
             self.year_page += 1;
         }
     }
 
-    fn draw_header(&mut self, _cx: &mut Cx2d, _scope: &mut Scope) {
-        // Header is drawn via DSL layout
+    fn update_view_visibility(&mut self, cx: &mut Cx) {
+        self.view.view(ids!(days_view)).set_visible(cx, self.view_mode == CalendarViewMode::Day);
+        self.view.view(ids!(months_view)).set_visible(cx, self.view_mode == CalendarViewMode::Month);
+        self.view.view(ids!(years_view)).set_visible(cx, self.view_mode == CalendarViewMode::Year);
+        self.view.redraw(cx);
     }
 
-    fn draw_days_view(&mut self, _cx: &mut Cx2d, _scope: &mut Scope) {
-        // Days view is drawn via DSL layout
+    fn update_header(&mut self, cx: &mut Cx) {
+        let month_text = month_name(self.current_month);
+        let year_text = self.current_year.to_string();
+
+        self.view.label(ids!(header.month_btn.label)).set_text(cx, month_text);
+        self.view.label(ids!(header.year_btn.label)).set_text(cx, &year_text);
     }
 
-    fn draw_months_view(&mut self, _cx: &mut Cx2d, _scope: &mut Scope) {
-        // Months view is drawn via DSL layout
+    fn update_days_view(&mut self, cx: &mut Cx) {
+        let first_weekday = weekday_of_first(self.current_year, self.current_month);
+        let days_count = days_in_month(self.current_year, self.current_month);
+
+        let (prev_year, prev_month) = if self.current_month == 1 {
+            (self.current_year - 1, 12)
+        } else {
+            (self.current_year, self.current_month - 1)
+        };
+        let prev_month_days = days_in_month(prev_year, prev_month);
+
+        for week in 0..5 {
+            for weekday in 0..7 {
+                let day_index = week * 7 + weekday;
+                let (year, month, day, is_current_month) = if day_index < first_weekday {
+                    let d = prev_month_days - (first_weekday - day_index - 1);
+                    (prev_year, prev_month, d, false)
+                } else if day_index - first_weekday >= days_count {
+                    let d = day_index - first_weekday - days_count + 1;
+                    let (ny, nm) = if self.current_month == 12 {
+                        (self.current_year + 1, 1)
+                    } else {
+                        (self.current_year, self.current_month + 1)
+                    };
+                    (ny, nm, d, false)
+                } else {
+                    let d = day_index - first_weekday + 1;
+                    (self.current_year, self.current_month, d, true)
+                };
+
+                let day_ids: &[LiveId] = &[
+                    LiveId::from_str("days_view"),
+                    LiveId::from_str(&format!("week{}", week)),
+                    LiveId::from_str(&format!("d{}", weekday)),
+                ];
+                let label_ids: &[LiveId] = &[
+                    LiveId::from_str("days_view"),
+                    LiveId::from_str(&format!("week{}", week)),
+                    LiveId::from_str(&format!("d{}", weekday)),
+                    LiveId::from_str("label"),
+                ];
+
+                self.view.label(label_ids).set_text(cx, &day.to_string());
+
+                let is_today = (year, month, day) == self.today;
+                let is_selected = self.selected_date.map_or(false, |d| {
+                    d.year == year && d.month == month && d.day == day
+                });
+
+                // Update visual state
+                self.view.view(day_ids).apply_over(cx, live! {
+                    draw_bg: {
+                        selected: (if is_selected { 1.0 } else { 0.0 }),
+                        is_today: (if is_today { 1.0 } else { 0.0 }),
+                        is_other_month: (if !is_current_month { 1.0 } else { 0.0 }),
+                    }
+                });
+            }
+        }
     }
 
-    fn draw_years_view(&mut self, _cx: &mut Cx2d, _scope: &mut Scope) {
-        // Years view is drawn via DSL layout
+    fn update_months_view(&mut self, cx: &mut Cx) {
+        for m in 0..12u32 {
+            let month_ids: &[LiveId] = &[
+                LiveId::from_str("months_view"),
+                LiveId::from_str(&format!("row{}", m / 3)),
+                LiveId::from_str(&format!("m{}", m)),
+            ];
+            let is_selected = m + 1 == self.current_month;
+
+            self.view.view(month_ids).apply_over(cx, live! {
+                draw_bg: {
+                    selected: (if is_selected { 1.0 } else { 0.0 }),
+                }
+            });
+        }
+    }
+
+    fn update_years_view(&mut self, cx: &mut Cx) {
+        let start_year = self.today.0 - 10 + self.year_page * 20;
+
+        for y in 0..20u32 {
+            let year = start_year + y as i32;
+            let year_ids: &[LiveId] = &[
+                LiveId::from_str("years_view"),
+                LiveId::from_str(&format!("row{}", y / 4)),
+                LiveId::from_str(&format!("y{}", y)),
+            ];
+            let label_ids: &[LiveId] = &[
+                LiveId::from_str("years_view"),
+                LiveId::from_str(&format!("row{}", y / 4)),
+                LiveId::from_str(&format!("y{}", y)),
+                LiveId::from_str("label"),
+            ];
+
+            self.view.label(label_ids).set_text(cx, &year.to_string());
+
+            let is_selected = year == self.current_year;
+            self.view.view(year_ids).apply_over(cx, live! {
+                draw_bg: {
+                    selected: (if is_selected { 1.0 } else { 0.0 }),
+                }
+            });
+        }
+    }
+
+    fn get_day_date(&self, week: u32, weekday: u32) -> Option<CalendarDate> {
+        let first_weekday = weekday_of_first(self.current_year, self.current_month);
+        let days_count = days_in_month(self.current_year, self.current_month);
+
+        let (prev_year, prev_month) = if self.current_month == 1 {
+            (self.current_year - 1, 12)
+        } else {
+            (self.current_year, self.current_month - 1)
+        };
+        let prev_month_days = days_in_month(prev_year, prev_month);
+
+        let day_index = week * 7 + weekday;
+        let (year, month, day) = if day_index < first_weekday {
+            let d = prev_month_days - (first_weekday - day_index - 1);
+            (prev_year, prev_month, d)
+        } else if day_index - first_weekday >= days_count {
+            let d = day_index - first_weekday - days_count + 1;
+            let (ny, nm) = if self.current_month == 12 {
+                (self.current_year + 1, 1)
+            } else {
+                (self.current_year, self.current_month + 1)
+            };
+            (ny, nm, d)
+        } else {
+            let d = day_index - first_weekday + 1;
+            (self.current_year, self.current_month, d)
+        };
+
+        Some(CalendarDate::new(year, month, day))
     }
 
     // Public API
     pub fn set_date(&mut self, date: CalendarDate) {
-        self.selected_date = date;
-        if let Some((year, month, _)) = date.start() {
-            self.current_year = year;
-            self.current_month = month;
-        }
+        self.selected_date = Some(date);
+        self.current_year = date.year;
+        self.current_month = date.month;
     }
 
-    pub fn date(&self) -> CalendarDate {
+    pub fn date(&self) -> Option<CalendarDate> {
         self.selected_date
     }
 
-    pub fn set_range_mode(&mut self, enabled: bool) {
-        self.range_mode = enabled;
-        if enabled {
-            self.selected_date = CalendarDate::Range(None, None);
-        } else {
-            self.selected_date = CalendarDate::Single(None);
-        }
-    }
-
-    pub fn set_view_mode(&mut self, mode: CalendarViewMode) {
-        self.view_mode = mode;
+    pub fn set_year_month(&mut self, year: i32, month: u32) {
+        self.current_year = year;
+        self.current_month = month;
     }
 }
 
@@ -1194,17 +829,11 @@ impl MpCalendarRef {
         }
     }
 
-    pub fn date(&self) -> CalendarDate {
+    pub fn date(&self) -> Option<CalendarDate> {
         if let Some(inner) = self.borrow() {
             inner.date()
         } else {
-            CalendarDate::default()
-        }
-    }
-
-    pub fn set_range_mode(&self, enabled: bool) {
-        if let Some(mut inner) = self.borrow_mut() {
-            inner.set_range_mode(enabled);
+            None
         }
     }
 }
