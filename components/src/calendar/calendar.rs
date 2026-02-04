@@ -9,15 +9,15 @@ live_design! {
 
     // Week day label
     CalendarWeekLabel = <View> {
-        width: 36.0,
-        height: 28.0,
+        width: 32.0,
+        height: 24.0,
         align: { x: 0.5, y: 0.5 }
 
         label = <Label> {
             width: Fit,
             height: Fit,
             draw_text: {
-                text_style: <THEME_FONT_REGULAR>{ font_size: 12.0 }
+                text_style: <THEME_FONT_REGULAR>{ font_size: 11.0 }
                 color: (MUTED_FOREGROUND)
             }
         }
@@ -25,53 +25,6 @@ live_design! {
 
     // Day cell button
     CalendarDayButton = <View> {
-        width: 36.0,
-        height: 36.0,
-        align: { x: 0.5, y: 0.5 }
-
-        show_bg: true
-        draw_bg: {
-            instance radius: 18.0
-            instance hover: 0.0
-            instance selected: 0.0
-            instance is_today: 0.0
-            instance is_other_month: 0.0
-            instance color: (TRANSPARENT)
-            instance color_hover: (SECONDARY)
-            instance color_selected: (PRIMARY)
-            instance color_today_border: (PRIMARY)
-
-            fn pixel(self) -> vec4 {
-                let sdf = Sdf2d::viewport(self.pos * self.rect_size);
-                let center = self.rect_size * 0.5;
-
-                sdf.circle(center.x, center.y, self.radius - 1.0);
-
-                let bg_color = mix(self.color, self.color_hover, self.hover);
-                let bg_color = mix(bg_color, self.color_selected, self.selected);
-
-                sdf.fill_keep(bg_color);
-
-                if self.is_today > 0.5 && self.selected < 0.5 {
-                    sdf.stroke(self.color_today_border, 1.5);
-                }
-
-                return sdf.result;
-            }
-        }
-
-        label = <Label> {
-            width: Fit,
-            height: Fit,
-            draw_text: {
-                text_style: <THEME_FONT_REGULAR>{ font_size: 13.0 }
-                color: (FOREGROUND)
-            }
-        }
-    }
-
-    // Navigation button
-    CalendarNavButton = <View> {
         width: 32.0,
         height: 32.0,
         align: { x: 0.5, y: 0.5 }
@@ -79,17 +32,46 @@ live_design! {
 
         show_bg: true
         draw_bg: {
-            instance radius: 6.0
+            instance radius: 16.0
             instance hover: 0.0
-            instance color: (TRANSPARENT)
-            instance color_hover: (SECONDARY)
+            instance down: 0.0
+            instance selected: 0.0
+            instance is_today: 0.0
+            instance is_other_month: 0.0
+            instance bg_color: (TRANSPARENT)
+            instance hover_color: (SECONDARY)
+            instance selected_color: (PRIMARY)
+            instance today_border_color: (PRIMARY)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
-                sdf.box(0.0, 0.0, self.rect_size.x, self.rect_size.y, self.radius);
-                let bg_color = mix(self.color, self.color_hover, self.hover);
-                sdf.fill(bg_color);
+                let center = self.rect_size * 0.5;
+
+                sdf.circle(center.x, center.y, self.radius - 1.0);
+
+                let c = mix(self.bg_color, self.hover_color, self.hover);
+                let c = mix(c, self.selected_color, self.selected);
+
+                sdf.fill_keep(c);
+
+                if self.is_today > 0.5 && self.selected < 0.5 {
+                    sdf.stroke(self.today_border_color, 1.5);
+                }
+
                 return sdf.result;
+            }
+        }
+
+        animator: {
+            hover = {
+                default: off
+                off = { from: {all: Forward {duration: 0.15}} apply: { draw_bg: { hover: 0.0 } } }
+                on = { from: {all: Forward {duration: 0.15}} apply: { draw_bg: { hover: 1.0 } } }
+            }
+            down = {
+                default: off
+                off = { from: {all: Forward {duration: 0.1}} apply: { draw_bg: { down: 0.0 } } }
+                on = { from: {all: Forward {duration: 0.1}} apply: { draw_bg: { down: 1.0 } } }
             }
         }
 
@@ -97,17 +79,16 @@ live_design! {
             width: Fit,
             height: Fit,
             draw_text: {
-                text_style: <THEME_FONT_BOLD>{ font_size: 16.0 }
+                text_style: <THEME_FONT_REGULAR>{ font_size: 12.0 }
                 color: (FOREGROUND)
             }
         }
     }
 
-    // Month/Year selector button
-    CalendarSelectorButton = <View> {
-        width: Fit,
-        height: 32.0,
-        padding: { left: 8.0, right: 8.0 }
+    // Navigation button
+    CalendarNavButton = <View> {
+        width: 28.0,
+        height: 28.0,
         align: { x: 0.5, y: 0.5 }
         cursor: Hand
 
@@ -115,15 +96,29 @@ live_design! {
         draw_bg: {
             instance radius: 6.0
             instance hover: 0.0
-            instance color: (TRANSPARENT)
-            instance color_hover: (SECONDARY)
+            instance down: 0.0
+            instance bg_color: (TRANSPARENT)
+            instance hover_color: (SECONDARY)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
                 sdf.box(0.0, 0.0, self.rect_size.x, self.rect_size.y, self.radius);
-                let bg_color = mix(self.color, self.color_hover, self.hover);
-                sdf.fill(bg_color);
+                let c = mix(self.bg_color, self.hover_color, self.hover);
+                sdf.fill(c);
                 return sdf.result;
+            }
+        }
+
+        animator: {
+            hover = {
+                default: off
+                off = { from: {all: Forward {duration: 0.15}} apply: { draw_bg: { hover: 0.0 } } }
+                on = { from: {all: Forward {duration: 0.15}} apply: { draw_bg: { hover: 1.0 } } }
+            }
+            down = {
+                default: off
+                off = { from: {all: Forward {duration: 0.1}} apply: { draw_bg: { down: 0.0 } } }
+                on = { from: {all: Forward {duration: 0.1}} apply: { draw_bg: { down: 1.0 } } }
             }
         }
 
@@ -137,10 +132,11 @@ live_design! {
         }
     }
 
-    // Month item for month view
-    CalendarMonthButton = <View> {
-        width: 70.0,
-        height: 36.0,
+    // Month/Year selector button
+    CalendarSelectorButton = <View> {
+        width: Fit,
+        height: 28.0,
+        padding: { left: 6.0, right: 6.0 }
         align: { x: 0.5, y: 0.5 }
         cursor: Hand
 
@@ -148,18 +144,29 @@ live_design! {
         draw_bg: {
             instance radius: 6.0
             instance hover: 0.0
-            instance selected: 0.0
-            instance color: (TRANSPARENT)
-            instance color_hover: (SECONDARY)
-            instance color_selected: (PRIMARY)
+            instance down: 0.0
+            instance bg_color: (TRANSPARENT)
+            instance hover_color: (SECONDARY)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
                 sdf.box(0.0, 0.0, self.rect_size.x, self.rect_size.y, self.radius);
-                let bg_color = mix(self.color, self.color_hover, self.hover);
-                let bg_color = mix(bg_color, self.color_selected, self.selected);
-                sdf.fill(bg_color);
+                let c = mix(self.bg_color, self.hover_color, self.hover);
+                sdf.fill(c);
                 return sdf.result;
+            }
+        }
+
+        animator: {
+            hover = {
+                default: off
+                off = { from: {all: Forward {duration: 0.15}} apply: { draw_bg: { hover: 0.0 } } }
+                on = { from: {all: Forward {duration: 0.15}} apply: { draw_bg: { hover: 1.0 } } }
+            }
+            down = {
+                default: off
+                off = { from: {all: Forward {duration: 0.1}} apply: { draw_bg: { down: 0.0 } } }
+                on = { from: {all: Forward {duration: 0.1}} apply: { draw_bg: { down: 1.0 } } }
             }
         }
 
@@ -167,7 +174,57 @@ live_design! {
             width: Fit,
             height: Fit,
             draw_text: {
-                text_style: <THEME_FONT_REGULAR>{ font_size: 13.0 }
+                text_style: <THEME_FONT_BOLD>{ font_size: 13.0 }
+                color: (FOREGROUND)
+            }
+        }
+    }
+
+    // Month item for month view
+    CalendarMonthButton = <View> {
+        width: 60.0,
+        height: 32.0,
+        align: { x: 0.5, y: 0.5 }
+        cursor: Hand
+
+        show_bg: true
+        draw_bg: {
+            instance radius: 6.0
+            instance hover: 0.0
+            instance down: 0.0
+            instance selected: 0.0
+            instance bg_color: (TRANSPARENT)
+            instance hover_color: (SECONDARY)
+            instance selected_color: (PRIMARY)
+
+            fn pixel(self) -> vec4 {
+                let sdf = Sdf2d::viewport(self.pos * self.rect_size);
+                sdf.box(0.0, 0.0, self.rect_size.x, self.rect_size.y, self.radius);
+                let c = mix(self.bg_color, self.hover_color, self.hover);
+                let c = mix(c, self.selected_color, self.selected);
+                sdf.fill(c);
+                return sdf.result;
+            }
+        }
+
+        animator: {
+            hover = {
+                default: off
+                off = { from: {all: Forward {duration: 0.15}} apply: { draw_bg: { hover: 0.0 } } }
+                on = { from: {all: Forward {duration: 0.15}} apply: { draw_bg: { hover: 1.0 } } }
+            }
+            down = {
+                default: off
+                off = { from: {all: Forward {duration: 0.1}} apply: { draw_bg: { down: 0.0 } } }
+                on = { from: {all: Forward {duration: 0.1}} apply: { draw_bg: { down: 1.0 } } }
+            }
+        }
+
+        label = <Label> {
+            width: Fit,
+            height: Fit,
+            draw_text: {
+                text_style: <THEME_FONT_REGULAR>{ font_size: 12.0 }
                 color: (FOREGROUND)
             }
         }
@@ -175,8 +232,8 @@ live_design! {
 
     // Year item for year view
     CalendarYearButton = <View> {
-        width: 56.0,
-        height: 36.0,
+        width: 50.0,
+        height: 32.0,
         align: { x: 0.5, y: 0.5 }
         cursor: Hand
 
@@ -184,18 +241,32 @@ live_design! {
         draw_bg: {
             instance radius: 6.0
             instance hover: 0.0
+            instance down: 0.0
             instance selected: 0.0
-            instance color: (TRANSPARENT)
-            instance color_hover: (SECONDARY)
-            instance color_selected: (PRIMARY)
+            instance bg_color: (TRANSPARENT)
+            instance hover_color: (SECONDARY)
+            instance selected_color: (PRIMARY)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
                 sdf.box(0.0, 0.0, self.rect_size.x, self.rect_size.y, self.radius);
-                let bg_color = mix(self.color, self.color_hover, self.hover);
-                let bg_color = mix(bg_color, self.color_selected, self.selected);
-                sdf.fill(bg_color);
+                let c = mix(self.bg_color, self.hover_color, self.hover);
+                let c = mix(c, self.selected_color, self.selected);
+                sdf.fill(c);
                 return sdf.result;
+            }
+        }
+
+        animator: {
+            hover = {
+                default: off
+                off = { from: {all: Forward {duration: 0.15}} apply: { draw_bg: { hover: 0.0 } } }
+                on = { from: {all: Forward {duration: 0.15}} apply: { draw_bg: { hover: 1.0 } } }
+            }
+            down = {
+                default: off
+                off = { from: {all: Forward {duration: 0.1}} apply: { draw_bg: { down: 0.0 } } }
+                on = { from: {all: Forward {duration: 0.1}} apply: { draw_bg: { down: 1.0 } } }
             }
         }
 
@@ -203,7 +274,7 @@ live_design! {
             width: Fit,
             height: Fit,
             draw_text: {
-                text_style: <THEME_FONT_REGULAR>{ font_size: 13.0 }
+                text_style: <THEME_FONT_REGULAR>{ font_size: 12.0 }
                 color: (FOREGROUND)
             }
         }
@@ -214,15 +285,16 @@ live_design! {
         width: Fit,
         height: Fit,
         flow: Down,
-        padding: 16.0,
-        spacing: 8.0,
+        padding: 12.0,
+        spacing: 6.0,
+        align: { x: 0.5, y: 0.0 }
 
         show_bg: true
         draw_bg: {
             instance radius: 8.0
             instance border_width: 1.0
             instance border_color: (BORDER)
-            instance color: (CARD)
+            instance bg_color: (CARD)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
@@ -233,7 +305,7 @@ live_design! {
                     self.rect_size.y - self.border_width * 2.0,
                     self.radius
                 );
-                sdf.fill_keep(self.color);
+                sdf.fill_keep(self.bg_color);
                 sdf.stroke(self.border_color, self.border_width);
                 return sdf.result;
             }
@@ -241,27 +313,29 @@ live_design! {
 
         // Header with navigation
         header = <View> {
-            width: Fill,
-            height: Fit,
+            width: Fit,
+            height: 32.0,
             flow: Right,
-            spacing: 8.0,
+            spacing: 4.0,
             align: { x: 0.5, y: 0.5 }
 
             prev_btn = <CalendarNavButton> {
                 label = { text: "<" }
             }
 
-            <View> { width: Fill, height: 1.0 }
+            <View> { width: 20.0, height: Fit }
 
             month_btn = <CalendarSelectorButton> {
                 label = { text: "February" }
             }
 
+            <View> { width: 8.0, height: Fit }
+
             year_btn = <CalendarSelectorButton> {
                 label = { text: "2026" }
             }
 
-            <View> { width: Fill, height: 1.0 }
+            <View> { width: 20.0, height: Fit }
 
             next_btn = <CalendarNavButton> {
                 label = { text: ">" }
