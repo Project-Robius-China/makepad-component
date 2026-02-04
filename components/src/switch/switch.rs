@@ -4,6 +4,7 @@ live_design! {
     use link::theme::*;
     use link::shaders::*;
     use link::widgets::*;
+    use link::theme_colors::*;
 
     // Switch toggle component
     pub MpSwitch = {{MpSwitch}} {
@@ -30,10 +31,10 @@ live_design! {
                     sdf.rect(r, 0.0, sz.x - sz.y, sz.y);
                     sdf.circle(sz.x - r, r, r);
 
-                    let bg_off = #cbd5e1;
-                    let bg_on = #3b82f6;
+                    let bg_off = (BORDER);
+                    let bg_on = (PRIMARY);
                     let color = mix(bg_off, bg_on, self.on);
-                    let color = mix(color, #ffffff, self.hover * 0.1);
+                    let color = mix(color, (PRIMARY_FOREGROUND), self.hover * 0.1);
 
                     sdf.fill(color);
                     return sdf.result;
@@ -58,7 +59,7 @@ live_design! {
                         let radius = self.rect_size.y * 0.5;
 
                         sdf.circle(radius, radius, radius);
-                        sdf.fill(#ffffff);
+                        sdf.fill((PRIMARY_FOREGROUND));
 
                         return sdf.result;
                     }

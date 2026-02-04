@@ -5,7 +5,7 @@ live_design! {
     use link::shaders::*;
     use link::widgets::*;
 
-    use crate::theme::colors::*;
+    use link::theme_colors::*;
 
     // Shared spinner shader function - uses angle-based arc drawing
     SPINNER_SHADER = {
@@ -43,8 +43,8 @@ live_design! {
         show_bg: true
         draw_bg: {
             instance rotation: 0.0
-            instance spinner_color: #3b82f6
-            instance spinner_track: #e5e7eb
+            instance spinner_color: (PRIMARY)
+            instance spinner_track: (MUTED)
             instance stroke_width: 3.0
             instance arc_ratio: 0.25
 
@@ -93,9 +93,9 @@ live_design! {
     // ============================================================
 
     pub MpSpinnerPrimary = <MpSpinner> { draw_bg: { spinner_color: (PRIMARY) } }
-    pub MpSpinnerSuccess = <MpSpinner> { draw_bg: { spinner_color: #22c55e, spinner_track: #dcfce7 } }
-    pub MpSpinnerWarning = <MpSpinner> { draw_bg: { spinner_color: #f59e0b, spinner_track: #fef3c7 } }
-    pub MpSpinnerDanger = <MpSpinner> { draw_bg: { spinner_color: #dc2626, spinner_track: #fee2e2 } }
+    pub MpSpinnerSuccess = <MpSpinner> { draw_bg: { spinner_color: (SUCCESS), spinner_track: (MUTED) } }
+    pub MpSpinnerWarning = <MpSpinner> { draw_bg: { spinner_color: (WARNING), spinner_track: (MUTED) } }
+    pub MpSpinnerDanger = <MpSpinner> { draw_bg: { spinner_color: (DANGER), spinner_track: (MUTED) } }
 
     // ============================================================
     // Style variants

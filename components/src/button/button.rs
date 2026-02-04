@@ -5,7 +5,7 @@ live_design! {
     use link::shaders::*;
     use link::widgets::*;
 
-    use crate::theme::colors::*;
+    use link::theme_colors::*;
 
     // Base button component
     pub MpButton = {{MpButton}} {

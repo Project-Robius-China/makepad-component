@@ -1,57 +1,59 @@
 use makepad_widgets::*;
 
 live_design! {
-    // Primary colors (blue - using blue-500 #3b82f6)
-    pub PRIMARY = #3b82f6
-    pub PRIMARY_HOVER = #2563db
-    pub PRIMARY_ACTIVE = #1d4fd8
-    pub PRIMARY_FOREGROUND = #ffffff
+    link theme_colors_light;
 
-    // Secondary colors (gray)
-    pub SECONDARY = #f1f5f9
-    pub SECONDARY_HOVER = #d2d8f0
-    pub SECONDARY_ACTIVE = #cbd5d1
-    pub SECONDARY_FOREGROUND = #0f172a
+    // Primary colors
+    pub PRIMARY = #x165dff
+    pub PRIMARY_HOVER = #x4080ff
+    pub PRIMARY_ACTIVE = #x0e42d2
+    pub PRIMARY_FOREGROUND = #xffffff
 
-    // Danger colors (red)
-    pub DANGER = #dc2626
-    pub DANGER_HOVER = #b91c1c
-    pub DANGER_ACTIVE = #991b1b
-    pub DANGER_FOREGROUND = #ffffff
+    // Secondary colors
+    pub SECONDARY = #xf2f3f5
+    pub SECONDARY_HOVER = #xe5e6eb
+    pub SECONDARY_ACTIVE = #xc9cdd4
+    pub SECONDARY_FOREGROUND = #x1d2129
 
-    // Success colors (green)
-    pub SUCCESS = #16a34a
-    pub SUCCESS_HOVER = #15803d
-    pub SUCCESS_FOREGROUND = #ffffff
+    // Danger colors
+    pub DANGER = #xf53f3f
+    pub DANGER_HOVER = #xf76560
+    pub DANGER_ACTIVE = #xcb272d
+    pub DANGER_FOREGROUND = #xffffff
 
-    // Warning colors (yellow)
-    pub WARNING = #f59a0b
-    pub WARNING_HOVER = #d97706
-    pub WARNING_FOREGROUND = #ffffff
+    // Success colors
+    pub SUCCESS = #x00b42a
+    pub SUCCESS_HOVER = #x23c343
+    pub SUCCESS_FOREGROUND = #xffffff
 
-    // Info colors (cyan - using #06b6d4)
-    pub INFO = #06b6d4
-    pub INFO_HOVER = #0891b2
-    pub INFO_FOREGROUND = #ffffff
+    // Warning colors
+    pub WARNING = #xff7d00
+    pub WARNING_HOVER = #xff9a2e
+    pub WARNING_FOREGROUND = #xffffff
+
+    // Info colors
+    pub INFO = #x14c9c9
+    pub INFO_HOVER = #x37d4cf
+    pub INFO_FOREGROUND = #xffffff
 
     // UI colors
-    pub BACKGROUND = #ffffff
-    pub FOREGROUND = #0f172a
-    pub BORDER = #d2d8f0
-    pub INPUT = #f1f5f9
-    pub RING = #3b82f6
-    pub MUTED = #f1f5f9
-    pub MUTED_FOREGROUND = #64748b
+    pub BACKGROUND = #xffffff
+    pub FOREGROUND = #x1d2129
+    pub BORDER = #xe5e6eb
+    pub INPUT = #xffffff
+    pub RING = #x165dff
+    pub MUTED = #xf7f8fa
+    pub MUTED_FOREGROUND = #x86909c
 
     // Card colors
-    pub CARD = #ffffff
-    pub CARD_FOREGROUND = #0f172a
+    pub CARD = #xffffff
+    pub CARD_FOREGROUND = #x1d2129
 
-    // Accent colors (using purple/violet)
-    pub ACCENT = #8b5cf6
-    pub ACCENT_HOVER = #7c3aed
-    pub ACCENT_FOREGROUND = #ffffff
+    // Accent colors
+    pub ACCENT = #x722ed1
+    pub ACCENT_HOVER = #x8d4eda
+    pub ACCENT_FOREGROUND = #xffffff
 
     // Transparent
-    pub TRANSPARENT = #0000
+    pub TRANSPARENT = #x00000000
 }

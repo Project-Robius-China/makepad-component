@@ -1,4 +1,5 @@
 pub extern crate makepad_widgets;
+pub mod shell;
 
 pub mod theme;
 #[cfg(feature = "Accordion")]
@@ -33,6 +34,10 @@ pub mod checkbox;
 #[path ="./calendar/calendar.rs"]
 pub mod calendar;
 
+#[cfg(feature = "ColorPicker")]
+#[path ="./color_picker/color_picker.rs"]
+pub mod color_picker;
+
 #[cfg(feature = "Divider")]
 #[path ="./divider/divider.rs"]
 pub mod divider;
@@ -40,6 +45,10 @@ pub mod divider;
 #[cfg(feature = "Dropdown")]
 #[path ="./dropdown/dropdown.rs"]
 pub mod dropdown;
+
+#[cfg(feature = "Drawer")]
+#[path ="./drawer/drawer.rs"]
+pub mod drawer;
 
 #[cfg(feature = "Input")]
 #[path ="./input/input.rs"]
@@ -52,6 +61,10 @@ pub mod label;
 #[cfg(feature = "Layout")]
 #[path ="./layout/layout.rs"]
 pub mod layout;
+
+#[cfg(feature = "Link")]
+#[path ="./link/link.rs"]
+pub mod link;
 
 #[cfg(feature = "List")]
 #[path ="./list/list.rs"]
@@ -109,6 +122,10 @@ pub mod text;
 #[path ="./tooltip/tooltip.rs"]
 pub mod tooltip;
 
+#[cfg(feature = "Space")]
+#[path ="./space/space.rs"]
+pub mod space;
+
 use makepad_widgets::Cx;
 
 pub fn live_design(cx: &mut Cx) {
@@ -129,16 +146,22 @@ pub fn live_design(cx: &mut Cx) {
     checkbox::live_design(cx);
     #[cfg(feature = "Calendar")]
     calendar::live_design(cx);
+    #[cfg(feature = "ColorPicker")]
+    color_picker::live_design(cx);
     #[cfg(feature = "Divider")]
     divider::live_design(cx);
     #[cfg(feature = "Dropdown")]
     dropdown::live_design(cx);
+    #[cfg(feature = "Drawer")]
+    drawer::live_design(cx);
     #[cfg(feature = "Input")]
     input::live_design(cx);
     #[cfg(feature = "Label")]
     label::live_design(cx);
     #[cfg(feature = "Layout")]
     layout::live_design(cx);
+    #[cfg(feature = "Link")]
+    link::live_design(cx);
     #[cfg(feature = "List")]
     list::live_design(cx);
     #[cfg(feature = "Modal")]
@@ -167,4 +190,6 @@ pub fn live_design(cx: &mut Cx) {
     text::live_design(cx);
     #[cfg(feature = "Tooltip")]
     tooltip::live_design(cx);
+    #[cfg(feature = "Space")]
+    space::live_design(cx);
 }

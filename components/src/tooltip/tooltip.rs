@@ -5,7 +5,7 @@ live_design! {
     use link::shaders::*;
     use link::widgets::*;
 
-    use crate::theme::colors::*;
+    use link::theme_colors::*;
 
     TOOLTIP_BG = #1f2937
     TOOLTIP_BORDER = #374151

@@ -5,7 +5,7 @@ live_design! {
     use link::shaders::*;
     use link::widgets::*;
 
-    use crate::theme::colors::*;
+    use link::theme_colors::*;
 
     // Slider component
     pub MpSlider = {{MpSlider}} {
@@ -17,10 +17,10 @@ live_design! {
             instance progress_end: 0.0
             instance disabled: 0.0
             instance vertical: 0.0
-            instance track_color: #e2e8f0
-            instance fill_color: #3b82f6
-            instance disabled_track_color: #f1f5f9
-            instance disabled_fill_color: #94a3b8
+            instance track_color: (BORDER)
+            instance fill_color: (PRIMARY)
+            instance disabled_track_color: (MUTED)
+            instance disabled_fill_color: (MUTED_FOREGROUND)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
@@ -83,8 +83,8 @@ live_design! {
             instance hover: 0.0
             instance pressed: 0.0
             instance disabled: 0.0
-            instance border_color: #3b82f6
-            instance disabled_border_color: #94a3b8
+            instance border_color: (PRIMARY)
+            instance disabled_border_color: (MUTED_FOREGROUND)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
@@ -127,8 +127,8 @@ live_design! {
             instance hover: 0.0
             instance pressed: 0.0
             instance disabled: 0.0
-            instance border_color: #3b82f6
-            instance disabled_border_color: #94a3b8
+            instance border_color: (PRIMARY)
+            instance disabled_border_color: (MUTED_FOREGROUND)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
@@ -195,21 +195,21 @@ live_design! {
 
     // Slider variants
     pub MpSliderSuccess = <MpSlider> {
-        draw_track: { fill_color: #22c55e }
-        draw_thumb: { border_color: #22c55e }
-        draw_thumb_start: { border_color: #22c55e }
+        draw_track: { fill_color: (SUCCESS) }
+        draw_thumb: { border_color: (SUCCESS) }
+        draw_thumb_start: { border_color: (SUCCESS) }
     }
 
     pub MpSliderWarning = <MpSlider> {
-        draw_track: { fill_color: #f59e0b }
-        draw_thumb: { border_color: #f59e0b }
-        draw_thumb_start: { border_color: #f59e0b }
+        draw_track: { fill_color: (WARNING) }
+        draw_thumb: { border_color: (WARNING) }
+        draw_thumb_start: { border_color: (WARNING) }
     }
 
     pub MpSliderDanger = <MpSlider> {
-        draw_track: { fill_color: #dc2626 }
-        draw_thumb: { border_color: #dc2626 }
-        draw_thumb_start: { border_color: #dc2626 }
+        draw_track: { fill_color: (DANGER) }
+        draw_thumb: { border_color: (DANGER) }
+        draw_thumb_start: { border_color: (DANGER) }
     }
 }
 

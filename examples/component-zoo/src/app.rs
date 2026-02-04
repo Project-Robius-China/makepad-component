@@ -5,6 +5,8 @@ use makepad_components::button::MpButtonWidgetRefExt;
 use makepad_components::calendar::MpCalendarAction;
 use makepad_components::card::MpCardAction;
 use makepad_components::checkbox::MpCheckboxWidgetRefExt;
+use makepad_components::color_picker::MpColorPickerWidgetRefExt;
+use makepad_components::drawer::MpDrawerWidgetWidgetRefExt;
 use makepad_components::modal::MpModalAction;
 use makepad_components::modal::MpModalWidgetWidgetRefExt;
 use makepad_components::notification::MpNotificationWidgetWidgetRefExt;
@@ -15,6 +17,7 @@ use makepad_components::skeleton::MpSkeletonWidgetWidgetRefExt;
 use makepad_components::slider::MpSliderWidgetRefExt;
 use makepad_components::switch::MpSwitchWidgetRefExt;
 use makepad_components::tab::MpTabWidgetRefExt;
+use makepad_components::theme::{apply_theme, ThemeMode};
 
 live_design! {
     use link::theme::*;
@@ -29,11 +32,14 @@ live_design! {
     use makepad_components::calendar::*;
     use makepad_components::card::*;
     use makepad_components::checkbox::*;
+    use makepad_components::color_picker::*;
     use makepad_components::divider::*;
     use makepad_components::dropdown::*;
+    use makepad_components::drawer::*;
     use makepad_components::input::*;
     use makepad_components::label::*;
     use makepad_components::layout::*;
+    use makepad_components::link::*;
     use makepad_components::list::*;
     use makepad_components::modal::*;
     use makepad_components::notification::*;
@@ -44,10 +50,11 @@ live_design! {
     use makepad_components::skeleton::*;
     use makepad_components::slider::*;
     use makepad_components::spinner::*;
+    use makepad_components::space::*;
     use makepad_components::switch::*;
     use makepad_components::tab::*;
     use makepad_components::text::*;
-    use makepad_components::theme::colors::*;
+    use link::theme_colors::*;
     use makepad_components::tooltip::*;
 
     // ============================================================
@@ -120,6 +127,18 @@ live_design! {
                             }
                             text: "A showcase of makepad-component widgets"
                         }
+
+                        <View> {
+                            width: Fill, height: Fit,
+                            flow: Right,
+                            align: { y: 0.5 }
+                            spacing: 8,
+
+                            <View> { width: Fill, height: Fit }
+                            <SubsectionLabel> { text: "Theme" }
+                            theme_toggle = <MpSwitch> { }
+                            theme_label = <SubsectionLabel> { text: "Light" }
+                        }
                     }
 
                     // Category Tab Bar
@@ -155,7 +174,7 @@ live_design! {
                             padding: { left: 24, right: 24, top: 24, bottom: 200 }
 
                             show_bg: true
-                            draw_bg: { color: #e2e8f0 }
+                            draw_bg: { color: (MUTED) }
 
                             // ===== Button Section =====
                             <View> {
@@ -608,6 +627,71 @@ live_design! {
 
                             <MpDivider> {}
 
+                            // ===== ColorPicker Section =====
+                            <View> {
+                                width: Fill, height: Fit,
+                                flow: Down,
+                                spacing: 16,
+
+                                <SectionHeader> { text: "ColorPicker" }
+
+                                // Default ColorPicker
+                                <View> {
+                                    width: Fill, height: Fit,
+                                    flow: Down,
+                                    spacing: 8,
+
+                                    <SubsectionLabel> { text: "Default" }
+
+                                    <View> {
+                                        width: Fill, height: Fit,
+                                        flow: Right,
+                                        spacing: 24,
+                                        align: { y: 0.0 }
+
+                                        color_picker = <MpColorPicker> {}
+
+                                        <View> {
+                                            width: Fit, height: Fit,
+                                            flow: Down,
+                                            spacing: 8,
+
+                                            <SubsectionLabel> { text: "Selected Color" }
+
+                                            color_display = <View> {
+                                                width: 100,
+                                                height: 100,
+                                                show_bg: true,
+                                                draw_bg: {
+                                                    color: #ff0000
+                                                    instance radius: 8.0
+
+                                                    fn pixel(self) -> vec4 {
+                                                        let sdf = Sdf2d::viewport(self.pos * self.rect_size);
+                                                        let sz = self.rect_size;
+                                                        sdf.box(0.5, 0.5, sz.x - 1.0, sz.y - 1.0, self.radius);
+                                                        sdf.fill(self.color);
+                                                        sdf.stroke(#e2e8f0, 1.0);
+                                                        return sdf.result;
+                                                    }
+                                                }
+                                            }
+
+                                            color_hex_label = <Label> {
+                                                width: Fit, height: Fit,
+                                                draw_text: {
+                                                    text_style: <THEME_FONT_REGULAR>{ font_size: 14.0 }
+                                                    color: (FOREGROUND)
+                                                }
+                                                text: "#FF0000"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            <MpDivider> {}
+
                             // ===== Input Section =====
                             <View> {
                                 width: Fill, height: Fit,
@@ -875,6 +959,67 @@ live_design! {
                                         <MpLabel> {
                                             text: "Hello World, Hello Universe"
                                             highlight: "hello"
+                                        }
+                                    }
+                                }
+                            }
+
+                            <MpDivider> {}
+
+                            // ===== Link Section =====
+                            <View> {
+                                width: Fill, height: Fit,
+                                flow: Down,
+                                spacing: 16,
+
+                                <SectionHeader> { text: "Link" }
+
+                                // Basic links
+                                <View> {
+                                    width: Fit, height: Fit,
+                                    flow: Down,
+                                    spacing: 8,
+
+                                    <SubsectionLabel> { text: "Basic Links" }
+
+                                    <View> {
+                                        width: Fit, height: Fit,
+                                        flow: Right,
+                                        spacing: 24,
+
+                                        <MpLink> {
+                                            text: "Simple Link"
+                                        }
+                                        <MpLink> {
+                                            text: "Visit Makepad"
+                                            href: "https://makepad.dev"
+                                        }
+                                        <MpLink> {
+                                            text: "GitHub"
+                                            href: "https://github.com/makepad/makepad"
+                                        }
+                                    }
+                                }
+
+                                // Disabled state
+                                <View> {
+                                    width: Fit, height: Fit,
+                                    flow: Down,
+                                    spacing: 8,
+
+                                    <SubsectionLabel> { text: "Disabled State" }
+
+                                    <View> {
+                                        width: Fit, height: Fit,
+                                        flow: Right,
+                                        spacing: 24,
+
+                                        <MpLink> {
+                                            text: "Active Link"
+                                        }
+                                        <MpLink> {
+                                            text: "Disabled Link"
+                                            disabled: true
                                         }
                                     }
                                 }
@@ -1702,7 +1847,7 @@ live_design! {
                             padding: { left: 24, right: 24, top: 24, bottom: 100 }
 
                             show_bg: true
-                            draw_bg: { color: #fef3c7 }
+                            draw_bg: { color: (MUTED) }
 
                             <View> {
                                 width: Fill, height: Fit,
@@ -2072,6 +2217,66 @@ live_design! {
                                     }
                                 }
                             }
+
+                            <MpDivider> {}
+
+                            <View> {
+                                width: Fill, height: Fit,
+                                flow: Down,
+                                spacing: 16,
+
+                                <SectionHeader> { text: "Space" }
+
+                                <View> {
+                                    width: Fit, height: Fit,
+                                    flow: Down,
+                                    spacing: 8,
+
+                                    <SubsectionLabel> { text: "Horizontal (Small)" }
+
+                                    <MpSpace> {
+                                        <MpButtonSmall> { text: "One" }
+                                        <MpButtonSmall> { text: "Two" }
+                                        <MpButtonSmall> { text: "Three" }
+                                    }
+                                }
+
+                                <View> {
+                                    width: Fit, height: Fit,
+                                    flow: Down,
+                                    spacing: 8,
+
+                                    <SubsectionLabel> { text: "Vertical (Medium)" }
+
+                                    <MpSpaceVertical> {
+                                        size: Medium
+
+                                        <Label> { text: "Line A" }
+                                        <Label> { text: "Line B" }
+                                        <Label> { text: "Line C" }
+                                    }
+                                }
+
+                                <View> {
+                                    width: Fit, height: Fit,
+                                    flow: Down,
+                                    spacing: 8,
+
+                                    <SubsectionLabel> { text: "Wrap (Large)" }
+
+                                    <MpSpaceWrap> {
+                                        width: 260
+                                        size: Large
+
+                                        <MpBadgeStandalone> { label = { text: "Alpha" } }
+                                        <MpBadgeStandalone> { label = { text: "Beta" } }
+                                        <MpBadgeStandalone> { label = { text: "Gamma" } }
+                                        <MpBadgeStandalone> { label = { text: "Delta" } }
+                                        <MpBadgeStandalone> { label = { text: "Epsilon" } }
+                                        <MpBadgeStandalone> { label = { text: "Zeta" } }
+                                    }
+                                }
+                            }
                         }
 
                         // ============================================================
@@ -2084,7 +2289,7 @@ live_design! {
                             padding: { left: 24, right: 24, top: 24, bottom: 100 }
 
                             show_bg: true
-                            draw_bg: { color: #bfdbfe }
+                            draw_bg: { color: (MUTED) }
 
                             // ===== Tab Section =====
                             <View> {
@@ -2275,7 +2480,7 @@ live_design! {
                             padding: { left: 24, right: 24, top: 24, bottom: 100 }
 
                             show_bg: true
-                            draw_bg: { color: #fde68a }
+                            draw_bg: { color: (MUTED) }
 
                             // ===== Tooltip Section =====
                             <View> {
@@ -2873,11 +3078,11 @@ live_design! {
                                 }
 
                                 // Alert Dialog preview
-                                <MpAlertDialog> {
-                                    width: 320,
-                                    header = {
-                                        title = { text: "Are you sure?" }
-                                    }
+                                    <MpAlertDialog> {
+                                        width: 320,
+                                        header = {
+                                            title = { text: "Are you sure?" }
+                                        }
                                     body = {
                                         <Label> {
                                             draw_text: {
@@ -2890,6 +3095,37 @@ live_design! {
                                     footer = {
                                         <MpButtonGhost> { text: "Cancel" }
                                         <MpButtonDanger> { text: "Delete" }
+                                    }
+                                }
+                            }
+
+                            <MpDivider> {}
+
+                            // ===== Drawer Section =====
+                            <View> {
+                                width: Fill, height: Fit,
+                                flow: Down,
+                                spacing: 16,
+
+                                <SectionHeader> { text: "Drawer" }
+
+                                <View> {
+                                    width: Fill, height: Fit,
+                                    flow: Right,
+                                    spacing: 12,
+                                    align: { y: 0.5 }
+
+                                    open_drawer_right = <MpButtonPrimary> { text: "Open Right" }
+                                    open_drawer_left = <MpButtonSecondary> { text: "Left" }
+                                    open_drawer_top = <MpButtonSecondary> { text: "Top" }
+                                    open_drawer_bottom = <MpButtonSecondary> { text: "Bottom" }
+
+                                    drawer_status = <Label> {
+                                        draw_text: {
+                                            text_style: <THEME_FONT_REGULAR>{ font_size: 14.0 }
+                                            color: (MUTED_FOREGROUND)
+                                        }
+                                        text: "Click a button to open a drawer"
                                     }
                                 }
                             }
@@ -3020,7 +3256,7 @@ live_design! {
                             padding: { left: 24, right: 24, top: 24, bottom: 100 }
 
                             show_bg: true
-                            draw_bg: { color: #fbcfe8 }
+                            draw_bg: { color: (MUTED) }
 
                             // ===== List Section =====
                             <View> {
@@ -3323,6 +3559,217 @@ live_design! {
                     }
                 } // close demo_modal
 
+                    demo_drawer_right = <MpDrawerWidget> {
+                        container = <MpDrawerContainerRight> {
+                            drawer = <MpDrawerRight> {
+                                header = {
+                                    title = { text: "Quick Settings" }
+                                }
+                                body = {
+                                    <Label> {
+                                        width: Fill,
+                                        height: Fit,
+                                        draw_text: {
+                                            text_style: <THEME_FONT_REGULAR>{ font_size: 14.0 }
+                                            color: (MUTED_FOREGROUND)
+                                            wrap: Word
+                                        }
+                                        text: "Adjust common preferences and update your profile information."
+                                    }
+
+                                    <MpDivider> { margin: { top: 8, bottom: 8 } }
+
+                                    <SubsectionLabel> { text: "Profile" }
+                                    <MpInput> { empty_text: "Full name" }
+                                    <MpInput> { empty_text: "Email address" }
+
+                                    <MpDivider> { margin: { top: 8, bottom: 8 } }
+
+                                    <SubsectionLabel> { text: "Preferences" }
+
+                                    <View> {
+                                        width: Fill, height: Fit,
+                                        flow: Right,
+                                        spacing: 12,
+                                        align: { y: 0.5 }
+
+                                        <Label> {
+                                            width: Fill, height: Fit,
+                                            draw_text: {
+                                                text_style: <THEME_FONT_REGULAR>{ font_size: 14.0 }
+                                                color: (FOREGROUND)
+                                            }
+                                            text: "Enable notifications"
+                                        }
+
+                                        <MpSwitch> { on: true }
+                                    }
+
+                                    <View> {
+                                        width: Fill, height: Fit,
+                                        flow: Right,
+                                        spacing: 12,
+                                        align: { y: 0.5 }
+
+                                        <Label> {
+                                            width: Fill, height: Fit,
+                                            draw_text: {
+                                                text_style: <THEME_FONT_REGULAR>{ font_size: 14.0 }
+                                                color: (FOREGROUND)
+                                            }
+                                            text: "Auto-save drafts"
+                                        }
+
+                                        <MpSwitch> { on: false }
+                                    }
+
+                                    <View> { width: Fill, height: 12 }
+                                }
+                                footer = {
+                                    <MpButtonGhost> { text: "Reset" }
+                                    <MpButtonPrimary> { text: "Save Changes" }
+                                }
+                            }
+                        }
+                    }
+
+                    demo_drawer_left = <MpDrawerWidgetLeft> {
+                        container = <MpDrawerContainerLeft> {
+                            drawer = <MpDrawerLeft> {
+                                header = {
+                                    title = { text: "Navigation" }
+                                }
+                                body = {
+                                    <View> {
+                                        width: Fill, height: Fit,
+                                        flow: Down,
+                                        spacing: 8
+
+                                        <MpButtonGhost> { text: "Dashboard" }
+                                        <MpButtonGhost> { text: "Projects" }
+                                        <MpButtonGhost> { text: "Team" }
+                                        <MpButtonGhost> { text: "Billing" }
+                                        <MpButtonGhost> { text: "Settings" }
+                                    }
+
+                                    <MpDivider> { margin: { top: 12, bottom: 12 } }
+
+                                    <SubsectionLabel> { text: "Shortcuts" }
+
+                                    <View> {
+                                        width: Fill, height: Fit,
+                                        flow: Down,
+                                        spacing: 8
+
+                                        <MpButtonSecondary> { text: "New Project" }
+                                        <MpButtonSecondary> { text: "Invite Member" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    demo_drawer_top = <MpDrawerWidgetTop> {
+                        max_height: 200,
+                        container = <MpDrawerContainerTop> {
+                            drawer = <MpDrawerTop> {
+                                header = {
+                                    title = { text: "Release Notes" }
+                                }
+                                body = {
+                                    <Label> {
+                                        width: Fill,
+                                        height: Fit,
+                                        draw_text: {
+                                            text_style: <THEME_FONT_REGULAR>{ font_size: 14.0 }
+                                            color: (MUTED_FOREGROUND)
+                                            wrap: Word
+                                        }
+                                        text: "Version 2.3 introduces performance improvements, a refreshed settings panel, and better keyboard navigation."
+                                    }
+
+                                    <MpDivider> { margin: { top: 8, bottom: 8 } }
+
+                                    <View> {
+                                        width: Fill, height: Fit,
+                                        flow: Down,
+                                        spacing: 8
+
+                                        <Label> {
+                                            width: Fill,
+                                            height: Fit,
+                                            draw_text: {
+                                                text_style: <THEME_FONT_REGULAR>{ font_size: 14.0 }
+                                                color: (FOREGROUND)
+                                                wrap: Word
+                                            }
+                                            text: "• Faster startup and reduced memory usage."
+                                        }
+                                        <Label> {
+                                            width: Fill,
+                                            height: Fit,
+                                            draw_text: {
+                                                text_style: <THEME_FONT_REGULAR>{ font_size: 14.0 }
+                                                color: (FOREGROUND)
+                                                wrap: Word
+                                            }
+                                            text: "• New shortcuts in the command palette."
+                                        }
+                                        <Label> {
+                                            width: Fill,
+                                            height: Fit,
+                                            draw_text: {
+                                                text_style: <THEME_FONT_REGULAR>{ font_size: 14.0 }
+                                                color: (FOREGROUND)
+                                                wrap: Word
+                                            }
+                                            text: "• Updated typography and spacing tokens."
+                                        }
+                                    }
+                                }
+                                footer = {
+                                    drawer_later_btn = <MpButtonGhost> { text: "Later" }
+                                    <MpButtonPrimary> { text: "Read More" }
+                                }
+                            }
+                        }
+                    }
+
+                    demo_drawer_bottom = <MpDrawerWidgetBottom> {
+                        max_height: 200,
+                        container = <MpDrawerContainerBottom> {
+                            drawer = <MpDrawerBottom> {
+                                header = {
+                                    title = { text: "Action Sheet" }
+                                }
+                                body = {
+                                    <Label> {
+                                        width: Fill,
+                                        height: Fit,
+                                        draw_text: {
+                                            text_style: <THEME_FONT_REGULAR>{ font_size: 14.0 }
+                                            color: (MUTED_FOREGROUND)
+                                            wrap: Word
+                                        }
+                                        text: "Choose what you'd like to do with this document."
+                                    }
+
+                                    <MpDivider> { margin: { top: 8, bottom: 8 } }
+
+                                    <View> {
+                                        width: Fill, height: Fit,
+                                        flow: Down,
+                                        spacing: 8
+
+                                        <MpButtonPrimary> { text: "Save and Continue" }
+                                        <MpButtonSecondary> { text: "Save Draft" }
+                                        <MpButtonDanger> { text: "Discard Changes" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     // Notification overlay - positioned at top-right
                     <View> {
                         width: Fill,
@@ -3345,7 +3792,7 @@ live_design! {
 
 app_main!(App);
 
-#[derive(Live, LiveHook)]
+#[derive(Live)]
 pub struct App {
     #[live]
     ui: WidgetRef,
@@ -3355,11 +3802,22 @@ pub struct App {
     current_page: usize,
     #[rust]
     current_category: usize,
+    #[rust]
+    is_dark: bool,
+}
+
+impl LiveHook for App {
+    fn after_apply(&mut self, cx: &mut Cx, _apply: &mut Apply, _index: usize, _nodes: &[LiveNode]) {
+        self.sync_theme_ui(cx);
+        self.sync_category_ui(cx);
+    }
 }
 
 impl LiveRegister for App {
     fn live_register(cx: &mut Cx) {
         crate::makepad_widgets::live_design(cx);
+        cx.link(live_id!(theme), live_id!(theme_desktop_light));
+        cx.link(live_id!(theme_colors), live_id!(theme_colors_light));
         makepad_components::live_design(cx);
     }
 }
@@ -3368,9 +3826,12 @@ impl MatchEvent for App {
     fn handle_startup(&mut self, cx: &mut Cx) {
         self.counter = 0;
         self.current_category = 0;
+        self.is_dark = false;
+
+        self.sync_theme_ui(cx);
 
         // Set initial category tab as selected
-        self.ui.mp_tab(ids!(cat_form)).set_selected(cx, true);
+        self.sync_category_ui(cx);
 
         // Initialize skeleton in loading state
         self.ui.mp_skeleton_widget(ids!(interactive_skeleton)).set_loading(cx, true);
@@ -3395,6 +3856,13 @@ impl MatchEvent for App {
         }
         if self.ui.mp_tab(ids!(cat_data)).clicked(&actions) {
             self.select_category(cx, 5);
+        }
+
+        if let Some(on) = self.ui.mp_switch(ids!(theme_toggle)).changed(&actions) {
+            self.is_dark = on;
+            let mode = if on { ThemeMode::Dark } else { ThemeMode::Light };
+            apply_theme(cx, mode);
+            self.sync_theme_ui(cx);
         }
 
         // Handle counter button
@@ -3506,6 +3974,16 @@ impl MatchEvent for App {
             self.ui.label(ids!(slider_range_success_label)).set_text(cx, &format!("Range: {} - {} (step 5)", start, end));
         }
 
+        // Handle color picker changes
+        if let Some(hsv) = self.ui.mp_color_picker(ids!(color_picker)).changed(&actions) {
+            let hex = hsv.to_hex();
+            let color = hsv.to_vec4();
+            self.ui.view(ids!(color_display)).apply_over(cx, live! {
+                draw_bg: { color: (color) }
+            });
+            self.ui.label(ids!(color_hex_label)).set_text(cx, &format!("#{}", hex));
+        }
+
         // Handle input changes
         if let Some(text) = self.ui.text_input(ids!(input_interactive)).changed(&actions) {
             let display = if text.is_empty() {
@@ -3567,6 +4045,45 @@ impl MatchEvent for App {
         if self.ui.mp_button(ids!(modal_confirm_btn)).clicked(&actions) {
             self.ui.mp_modal_widget(ids!(demo_modal)).close(cx);
             self.ui.label(ids!(modal_status)).set_text(cx, "Confirmed!");
+        }
+
+        if self.ui.mp_button(ids!(open_drawer_right)).clicked(&actions) {
+            self.ui.mp_drawer_widget(ids!(demo_drawer_right)).open(cx);
+            self.ui.label(ids!(drawer_status)).set_text(cx, "Right drawer opened");
+        }
+        if self.ui.mp_button(ids!(open_drawer_left)).clicked(&actions) {
+            self.ui.mp_drawer_widget(ids!(demo_drawer_left)).open(cx);
+            self.ui.label(ids!(drawer_status)).set_text(cx, "Left drawer opened");
+        }
+        if self.ui.mp_button(ids!(open_drawer_top)).clicked(&actions) {
+            self.ui.mp_drawer_widget(ids!(demo_drawer_top)).open(cx);
+            self.ui.label(ids!(drawer_status)).set_text(cx, "Top drawer opened");
+        }
+        if self.ui.mp_button(ids!(open_drawer_bottom)).clicked(&actions) {
+            self.ui.mp_drawer_widget(ids!(demo_drawer_bottom)).open(cx);
+            self.ui.label(ids!(drawer_status)).set_text(cx, "Bottom drawer opened");
+        }
+
+        if self.ui.mp_drawer_widget(ids!(demo_drawer_right)).close_requested(&actions) {
+            self.ui.mp_drawer_widget(ids!(demo_drawer_right)).close(cx);
+            self.ui.label(ids!(drawer_status)).set_text(cx, "Right drawer closed");
+        }
+        if self.ui.mp_drawer_widget(ids!(demo_drawer_left)).close_requested(&actions) {
+            self.ui.mp_drawer_widget(ids!(demo_drawer_left)).close(cx);
+            self.ui.label(ids!(drawer_status)).set_text(cx, "Left drawer closed");
+        }
+        if self.ui.mp_drawer_widget(ids!(demo_drawer_top)).close_requested(&actions) {
+            self.ui.mp_drawer_widget(ids!(demo_drawer_top)).close(cx);
+            self.ui.label(ids!(drawer_status)).set_text(cx, "Top drawer closed");
+        }
+        if self.ui.mp_drawer_widget(ids!(demo_drawer_bottom)).close_requested(&actions) {
+            self.ui.mp_drawer_widget(ids!(demo_drawer_bottom)).close(cx);
+            self.ui.label(ids!(drawer_status)).set_text(cx, "Bottom drawer closed");
+        }
+
+        if self.ui.mp_button(ids!(drawer_later_btn)).clicked(&actions) {
+            self.ui.mp_drawer_widget(ids!(demo_drawer_top)).close(cx);
+            self.ui.label(ids!(drawer_status)).set_text(cx, "Top drawer closed");
         }
 
         // Handle popover toggle button
@@ -3670,6 +4187,17 @@ impl MatchEvent for App {
 }
 
 impl App {
+    fn sync_theme_ui(&mut self, cx: &mut Cx) {
+        self.ui.mp_switch(ids!(theme_toggle)).set_on(cx, self.is_dark);
+        self.ui
+            .label(ids!(theme_label))
+            .set_text(cx, if self.is_dark { "Dark" } else { "Light" });
+    }
+
+    fn sync_category_ui(&mut self, cx: &mut Cx) {
+        self.select_category(cx, self.current_category);
+    }
+
     fn select_category(&mut self, cx: &mut Cx, index: usize) {
         self.current_category = index;
 

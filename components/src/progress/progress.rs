@@ -5,7 +5,7 @@ live_design! {
     use link::shaders::*;
     use link::widgets::*;
 
-    use crate::theme::colors::*;
+    use link::theme_colors::*;
 
     // Progress bar component
     pub MpProgress = {{MpProgress}} {
@@ -25,8 +25,8 @@ live_design! {
                 sdf.rect(r, 0.0, sz.x - sz.y, sz.y);
                 sdf.circle(sz.x - r, r, r);
 
-                let track_color = #e2e8f0;
-                let fill_color = #3b82f6;
+                let track_color = (BORDER);
+                let fill_color = (PRIMARY);
 
                 sdf.fill(track_color);
 
@@ -64,7 +64,7 @@ live_design! {
                 sdf.circle(r, r, r);
                 sdf.rect(r, 0.0, sz.x - sz.y, sz.y);
                 sdf.circle(sz.x - r, r, r);
-                sdf.fill(#e2e8f0);
+                sdf.fill((BORDER));
 
                 let fill_end = sz.x * self.progress;
                 let px = self.pos.x * sz.x;
@@ -74,7 +74,7 @@ live_design! {
                 sdf2.circle(r, r, r);
                 sdf2.rect(r, 0.0, sz.x - sz.y, sz.y);
                 sdf2.circle(sz.x - r, r, r);
-                sdf2.fill(#22c55e);
+                sdf2.fill((SUCCESS));
 
                 return mix(sdf.result, sdf2.result, in_fill * sdf2.result.w);
             }
@@ -93,7 +93,7 @@ live_design! {
                 sdf.circle(r, r, r);
                 sdf.rect(r, 0.0, sz.x - sz.y, sz.y);
                 sdf.circle(sz.x - r, r, r);
-                sdf.fill(#e2e8f0);
+                sdf.fill((BORDER));
 
                 let fill_end = sz.x * self.progress;
                 let px = self.pos.x * sz.x;
@@ -103,7 +103,7 @@ live_design! {
                 sdf2.circle(r, r, r);
                 sdf2.rect(r, 0.0, sz.x - sz.y, sz.y);
                 sdf2.circle(sz.x - r, r, r);
-                sdf2.fill(#f59e0b);
+                sdf2.fill((WARNING));
 
                 return mix(sdf.result, sdf2.result, in_fill * sdf2.result.w);
             }
@@ -122,7 +122,7 @@ live_design! {
                 sdf.circle(r, r, r);
                 sdf.rect(r, 0.0, sz.x - sz.y, sz.y);
                 sdf.circle(sz.x - r, r, r);
-                sdf.fill(#e2e8f0);
+                sdf.fill((BORDER));
 
                 let fill_end = sz.x * self.progress;
                 let px = self.pos.x * sz.x;
@@ -132,7 +132,7 @@ live_design! {
                 sdf2.circle(r, r, r);
                 sdf2.rect(r, 0.0, sz.x - sz.y, sz.y);
                 sdf2.circle(sz.x - r, r, r);
-                sdf2.fill(#dc2626);
+                sdf2.fill((DANGER));
 
                 return mix(sdf.result, sdf2.result, in_fill * sdf2.result.w);
             }
