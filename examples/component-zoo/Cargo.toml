@@ -12,6 +12,7 @@ makepad-components = { workspace = true, features = [
     "Avatar",
     "Badge",
     "Button",
+    "Calendar",
     "Card",
     "Checkbox",
     "Divider",

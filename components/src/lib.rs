@@ -29,6 +29,10 @@ pub mod card;
 #[path ="./checkbox/checkbox.rs"]
 pub mod checkbox;
 
+#[cfg(feature = "Calendar")]
+#[path ="./calendar/calendar.rs"]
+pub mod calendar;
+
 #[cfg(feature = "Divider")]
 #[path ="./divider/divider.rs"]
 pub mod divider;
@@ -123,6 +127,8 @@ pub fn live_design(cx: &mut Cx) {
     card::live_design(cx);
     #[cfg(feature = "Checkbox")]
     checkbox::live_design(cx);
+    #[cfg(feature = "Calendar")]
+    calendar::live_design(cx);
     #[cfg(feature = "Divider")]
     divider::live_design(cx);
     #[cfg(feature = "Dropdown")]
