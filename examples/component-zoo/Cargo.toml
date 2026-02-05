@@ -38,5 +38,6 @@ makepad-components = { workspace = true, features = [
     "Tab",
     "Text",
     "Tooltip",
+    "Table",
 ] }
 makepad-widgets    = { workspace = true }

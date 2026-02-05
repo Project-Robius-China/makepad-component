@@ -1,5 +1,15 @@
 use makepad_widgets::*;
 
+#[derive(Live, LiveHook, LiveRegister)]
+#[live_ignore]
+pub enum MpDrawerPlacement {
+    #[pick]
+    Right,
+    Left,
+    Top,
+    Bottom,
+}
+
 live_design! {
     use link::theme::*;
     use link::shaders::*;
@@ -326,15 +336,6 @@ live_design! {
         max_height: 420
         container = <MpDrawerContainerBottom> {}
     }
-}
-
-#[derive(Copy, Clone, Debug, Live, LiveHook)]
-pub enum MpDrawerPlacement {
-    #[pick]
-    Right,
-    Left,
-    Top,
-    Bottom,
 }
 
 #[derive(Live, Widget)]

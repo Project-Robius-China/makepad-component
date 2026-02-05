@@ -56,6 +56,7 @@ live_design! {
     use makepad_components::text::*;
     use link::theme_colors::*;
     use makepad_components::tooltip::*;
+    use makepad_components::table::*;
 
     // ============================================================
     // Section Header Component
@@ -3340,6 +3341,136 @@ live_design! {
                                                     <MpListItemTitle> { text: "Bob Johnson" }
                                                     <MpListItemDescription> { text: "Designer" }
                                                 }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            <MpDivider> {}
+
+                            // ===== Table Section =====
+                            <View> {
+                                width: Fill, height: Fit,
+                                flow: Down,
+                                spacing: 16,
+
+                                <SectionHeader> { text: "Table" }
+
+                                <View> {
+                                    width: Fill, height: Fit,
+                                    flow: Down,
+                                    spacing: 24,
+
+                                    // Basic Table
+                                    <View> {
+                                        width: Fill, height: Fit,
+                                        flow: Down,
+                                        spacing: 8,
+
+                                        <SubsectionLabel> { text: "Basic Table" }
+
+                                        <MpTable> {
+                                            <MpTableHeader> {
+                                                <MpTableHeaderCell> { width: 150.0, label = { text: "Name" } }
+                                                <MpTableHeaderCell> { width: 200.0, label = { text: "Email" } }
+                                                <MpTableHeaderCell> { width: 120.0, label = { text: "Role" } }
+                                                <MpTableHeaderCell> { width: 100.0, label = { text: "Status" } }
+                                            }
+                                            <MpTableRow> {
+                                                <MpTableCell> { width: 150.0, label = { text: "John Doe" } }
+                                                <MpTableCell> { width: 200.0, label = { text: "john@example.com" } }
+                                                <MpTableCell> { width: 120.0, label = { text: "Developer" } }
+                                                <MpTableCell> { width: 100.0, label = { text: "Active" } }
+                                            }
+                                            <MpTableRow> {
+                                                <MpTableCell> { width: 150.0, label = { text: "Jane Smith" } }
+                                                <MpTableCell> { width: 200.0, label = { text: "jane@example.com" } }
+                                                <MpTableCell> { width: 120.0, label = { text: "Designer" } }
+                                                <MpTableCell> { width: 100.0, label = { text: "Active" } }
+                                            }
+                                            <MpTableRow> {
+                                                <MpTableCell> { width: 150.0, label = { text: "Bob Wilson" } }
+                                                <MpTableCell> { width: 200.0, label = { text: "bob@example.com" } }
+                                                <MpTableCell> { width: 120.0, label = { text: "Manager" } }
+                                                <MpTableCell> { width: 100.0, label = { text: "Away" } }
+                                            }
+                                        }
+                                    }
+
+                                    // Striped Table
+                                    <View> {
+                                        width: Fill, height: Fit,
+                                        flow: Down,
+                                        spacing: 8,
+
+                                        <SubsectionLabel> { text: "Striped Table" }
+
+                                        <MpTable> {
+                                            stripe: true
+
+                                            <MpTableHeader> {
+                                                <MpTableHeaderCell> { width: 80.0, label = { text: "ID" } }
+                                                <MpTableHeaderCell> { width: 150.0, label = { text: "Product" } }
+                                                <MpTableHeaderCell> { width: 100.0, label = { text: "Price" } }
+                                                <MpTableHeaderCell> { width: 100.0, label = { text: "Stock" } }
+                                            }
+                                            <MpTableRow> {
+                                                draw_bg: { stripe: 0.0 }
+                                                <MpTableCell> { width: 80.0, label = { text: "001" } }
+                                                <MpTableCell> { width: 150.0, label = { text: "Laptop" } }
+                                                <MpTableCell> { width: 100.0, label = { text: "$999" } }
+                                                <MpTableCell> { width: 100.0, label = { text: "50" } }
+                                            }
+                                            <MpTableRow> {
+                                                draw_bg: { stripe: 1.0 }
+                                                <MpTableCell> { width: 80.0, label = { text: "002" } }
+                                                <MpTableCell> { width: 150.0, label = { text: "Mouse" } }
+                                                <MpTableCell> { width: 100.0, label = { text: "$29" } }
+                                                <MpTableCell> { width: 100.0, label = { text: "200" } }
+                                            }
+                                            <MpTableRow> {
+                                                draw_bg: { stripe: 0.0 }
+                                                <MpTableCell> { width: 80.0, label = { text: "003" } }
+                                                <MpTableCell> { width: 150.0, label = { text: "Keyboard" } }
+                                                <MpTableCell> { width: 100.0, label = { text: "$79" } }
+                                                <MpTableCell> { width: 100.0, label = { text: "150" } }
+                                            }
+                                            <MpTableRow> {
+                                                draw_bg: { stripe: 1.0 }
+                                                <MpTableCell> { width: 80.0, label = { text: "004" } }
+                                                <MpTableCell> { width: 150.0, label = { text: "Monitor" } }
+                                                <MpTableCell> { width: 100.0, label = { text: "$299" } }
+                                                <MpTableCell> { width: 100.0, label = { text: "75" } }
+                                            }
+                                        }
+                                    }
+
+                                    // Borderless Table
+                                    <View> {
+                                        width: Fill, height: Fit,
+                                        flow: Down,
+                                        spacing: 8,
+
+                                        <SubsectionLabel> { text: "Borderless Table" }
+
+                                        <MpTable> {
+                                            bordered: false
+
+                                            <MpTableHeader> {
+                                                <MpTableHeaderCell> { width: 150.0, label = { text: "Task" } }
+                                                <MpTableHeaderCell> { width: 120.0, label = { text: "Assignee" } }
+                                                <MpTableHeaderCell> { width: 100.0, label = { text: "Priority" } }
+                                            }
+                                            <MpTableRow> {
+                                                <MpTableCell> { width: 150.0, label = { text: "Fix login bug" } }
+                                                <MpTableCell> { width: 120.0, label = { text: "Alice" } }
+                                                <MpTableCell> { width: 100.0, label = { text: "High" } }
+                                            }
+                                            <MpTableRow> {
+                                                <MpTableCell> { width: 150.0, label = { text: "Update docs" } }
+                                                <MpTableCell> { width: 120.0, label = { text: "Bob" } }
+                                                <MpTableCell> { width: 100.0, label = { text: "Medium" } }
                                             }
                                         }
                                     }
