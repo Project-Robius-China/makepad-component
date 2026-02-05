@@ -122,6 +122,10 @@ pub mod text;
 #[path ="./tooltip/tooltip.rs"]
 pub mod tooltip;
 
+#[cfg(feature = "Table")]
+#[path ="./table/table.rs"]
+pub mod table;
+
 #[cfg(feature = "Space")]
 #[path ="./space/space.rs"]
 pub mod space;
@@ -192,4 +196,6 @@ pub fn live_design(cx: &mut Cx) {
     tooltip::live_design(cx);
     #[cfg(feature = "Space")]
     space::live_design(cx);
+    #[cfg(feature = "Table")]
+    table::live_design(cx);
 }
