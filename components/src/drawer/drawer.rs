@@ -1,6 +1,7 @@
 use makepad_widgets::*;
 
-#[derive(Copy, Clone, Debug, Live, LiveHook)]
+#[derive(Live, LiveHook, LiveRegister)]
+#[live_ignore]
 pub enum MpDrawerPlacement {
     #[pick]
     Right,
