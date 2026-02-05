@@ -30,6 +30,10 @@ pub mod card;
 #[path ="./checkbox/checkbox.rs"]
 pub mod checkbox;
 
+#[cfg(feature = "Calendar")]
+#[path ="./calendar/calendar.rs"]
+pub mod calendar;
+
 #[cfg(feature = "ColorPicker")]
 #[path ="./color_picker/color_picker.rs"]
 pub mod color_picker;
@@ -140,6 +144,8 @@ pub fn live_design(cx: &mut Cx) {
     card::live_design(cx);
     #[cfg(feature = "Checkbox")]
     checkbox::live_design(cx);
+    #[cfg(feature = "Calendar")]
+    calendar::live_design(cx);
     #[cfg(feature = "ColorPicker")]
     color_picker::live_design(cx);
     #[cfg(feature = "Divider")]
