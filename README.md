@@ -1,6 +1,6 @@
 # Makepad Component
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/ZhangHanDong/makepad-component)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/Project-Robius-China/makepad-component)
 [![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-green.svg)](LICENSE)
 
 **[中文](README_zh.md) | [日本語](README_ja.md)**
@@ -46,24 +46,11 @@ These projects are developed under the [Robius](https://github.com/project-robiu
 
 ### Components (v0.1.0)
 
-- **Button** - Primary, Secondary, Danger, Ghost variants with sizes
-- **Checkbox** - With label and indeterminate state
-- **Switch** - Toggle switch with animations
-- **Radio** - Radio button groups
-- **Divider** - Horizontal/vertical separators
-- **Progress** - Linear progress bar
-- **Slider** - Single/Range mode, Vertical, Logarithmic scale, Disabled state
-- **Badge** - Notification badges with variants
-- **Tooltip** - Four positions with edge detection and auto-flip
-- **Input** - Text input field
+Accordion, Alert, Avatar, Badge, Button, Calendar, Card, Checkbox, Color Picker, Divider, Drawer, Dropdown, Input, Label, Layout, Link, List, Modal, Notification, Page Flip, Popover, Progress, Radio, Skeleton, Slider, Spinner, Space, Switch, Tab, Table, Text, Tooltip.
 
-### Coming Soon
+### Shell Integration
 
-- Spinner
-- Modal
-- Dropdown
-- Select
-- And more...
+This crate re-exports `makepad-shell` via `makepad_components::shell` for app menus, tray icons, and context menus. The shell layer lives at https://github.com/Project-Robius-China/makepad-shell. See `examples/shell-demo` for a full example.
 
 ## Installation
 
@@ -71,19 +58,33 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-makepad-component = { git = "https://github.com/ZhangHanDong/makepad-component", branch = "main" }
+makepad-components = { git = "https://github.com/Project-Robius-China/makepad-component", branch = "main", features = ["Button", "Checkbox", "Switch", "Slider"] }
 ```
+
+### Feature Flags
+
+All UI components are behind Cargo features. Enable only what you use:
+
+```toml
+makepad-components = { git = "https://github.com/Project-Robius-China/makepad-component", branch = "main", features = ["Modal", "Button", "Input", "Tooltip"] }
+```
+
+Notes:
+- There is no `all` feature; list the components you want.
+- `Modal` depends on `Button` (it is enabled automatically).
 
 ## Usage
 
 ```rust
 use makepad_widgets::*;
-use makepad_component::*;
 
 live_design! {
     use link::theme::*;
     use link::widgets::*;
-    use makepad_component::*;
+    use makepad_components::button::*;
+    use makepad_components::checkbox::*;
+    use makepad_components::slider::*;
+    use makepad_components::switch::*;
 
     App = {{App}} {
         ui: <Root> {
@@ -100,6 +101,29 @@ live_design! {
         }
     }
 }
+
+app_main!(App);
+
+#[derive(Live, LiveHook)]
+pub struct App {
+    #[live]
+    ui: WidgetRef,
+}
+
+impl LiveRegister for App {
+    fn live_register(cx: &mut Cx) {
+        makepad_widgets::live_design(cx);
+        cx.link(live_id!(theme), live_id!(theme_desktop_light));
+        cx.link(live_id!(theme_colors), live_id!(theme_colors_light));
+        makepad_components::live_design(cx);
+    }
+}
+
+impl AppMain for App {
+    fn handle_event(&mut self, cx: &mut Cx, event: &Event) {
+        self.ui.handle_event(cx, event, &mut Scope::empty());
+    }
+}
 ```
 
 ## Running the Demo
@@ -108,11 +132,14 @@ live_design! {
 
 ```bash
 # Clone the repository
-git clone https://github.com/ZhangHanDong/makepad-component
+git clone https://github.com/Project-Robius-China/makepad-component
 cd makepad-component
 
 # Run the component zoo demo
 cargo run -p component-zoo
+
+# Run the makepad-shell demo (menus, tray, context menu)
+cargo run -p shell-demo
 ```
 
 ### Web (WebAssembly)
