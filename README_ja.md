@@ -1,6 +1,6 @@
 # Makepad Component
 
-[![バージョン](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/ZhangHanDong/makepad-component)
+[![バージョン](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/Project-Robius-China/makepad-component)
 [![ライセンス](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-green.svg)](LICENSE)
 
 **[English](README.md) | [中文](README_zh.md)**
@@ -42,23 +42,11 @@
 
 ### コンポーネント (v0.1.0)
 
-- **Button** - Primary、Secondary、Danger、Ghost バリアント、複数サイズ対応
-- **Checkbox** - ラベルと不確定状態をサポート
-- **Switch** - アニメーション付きトグルスイッチ
-- **Radio** - ラジオボタングループ
-- **Divider** - 水平/垂直セパレーター
-- **Progress** - 線形プログレスバー
-- **Slider** - シングル/レンジモード、垂直方向、対数スケール、無効状態
+Accordion、Alert、Avatar、Badge、Button、Calendar、Card、Checkbox、Color Picker、Divider、Drawer、Dropdown、Input、Label、Layout、Link、List、Modal、Notification、Page Flip、Popover、Progress、Radio、Skeleton、Slider、Spinner、Space、Switch、Tab、Table、Text、Tooltip。
 
-### 今後追加予定
+### Shell 連携
 
-- TextInput（テキスト入力）
-- Badge（バッジ）
-- Tooltip（ツールチップ）
-- Spinner（ローディング）
-- Modal（モーダル）
-- Dropdown（ドロップダウン）
-- その他...
+このクレートは `makepad_components::shell` 経由で `makepad-shell` を再エクスポートし、アプリメニュー、トレイアイコン、コンテキストメニューに利用できます。makepad-shell リポジトリ：https://github.com/Project-Robius-China/makepad-shell。完全な例は `examples/shell-demo` を参照してください。
 
 ## インストール
 
@@ -66,19 +54,33 @@
 
 ```toml
 [dependencies]
-makepad-component = { git = "https://github.com/ZhangHanDong/makepad-component", branch = "main" }
+makepad-components = { git = "https://github.com/Project-Robius-China/makepad-component", branch = "main", features = ["Button", "Checkbox", "Switch", "Slider"] }
 ```
+
+### Feature Flags
+
+すべての UI コンポーネントは Cargo feature で管理されています。必要なものだけ有効化してください。
+
+```toml
+makepad-components = { git = "https://github.com/Project-Robius-China/makepad-component", branch = "main", features = ["Modal", "Button", "Input", "Tooltip"] }
+```
+
+注意：
+- `all` feature はありません。必要なコンポーネントを列挙してください。
+- `Modal` は `Button` に依存します（自動で有効化されます）。
 
 ## 使用方法
 
 ```rust
 use makepad_widgets::*;
-use makepad_component::*;
 
 live_design! {
     use link::theme::*;
     use link::widgets::*;
-    use makepad_component::*;
+    use makepad_components::button::*;
+    use makepad_components::checkbox::*;
+    use makepad_components::slider::*;
+    use makepad_components::switch::*;
 
     App = {{App}} {
         ui: <Root> {
@@ -95,17 +97,43 @@ live_design! {
         }
     }
 }
+
+app_main!(App);
+
+#[derive(Live, LiveHook)]
+pub struct App {
+    #[live]
+    ui: WidgetRef,
+}
+
+impl LiveRegister for App {
+    fn live_register(cx: &mut Cx) {
+        makepad_widgets::live_design(cx);
+        cx.link(live_id!(theme), live_id!(theme_desktop_light));
+        cx.link(live_id!(theme_colors), live_id!(theme_colors_light));
+        makepad_components::live_design(cx);
+    }
+}
+
+impl AppMain for App {
+    fn handle_event(&mut self, cx: &mut Cx, event: &Event) {
+        self.ui.handle_event(cx, event, &mut Scope::empty());
+    }
+}
 ```
 
 ## デモの実行
 
 ```bash
 # リポジトリをクローン
-git clone https://github.com/ZhangHanDong/makepad-component
+git clone https://github.com/Project-Robius-China/makepad-component
 cd makepad-component
 
 # コンポーネントズーデモを実行
 cargo run -p component-zoo
+
+# makepad-shell デモを実行（メニュー/トレイ/コンテキストメニュー）
+cargo run -p shell-demo
 ```
 
 ---

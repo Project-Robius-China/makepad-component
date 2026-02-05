@@ -1,6 +1,6 @@
 # Makepad Component
 
-[![版本](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/ZhangHanDong/makepad-component)
+[![版本](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/Project-Robius-China/makepad-component)
 [![许可证](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-green.svg)](LICENSE)
 
 **[English](README.md) | [日本語](README_ja.md)**
@@ -42,23 +42,11 @@
 
 ### 组件 (v0.1.0)
 
-- **Button** - Primary、Secondary、Danger、Ghost 变体，支持多种尺寸
-- **Checkbox** - 支持标签和不确定状态
-- **Switch** - 带动画的开关切换
-- **Radio** - 单选按钮组
-- **Divider** - 水平/垂直分隔线
-- **Progress** - 线性进度条
-- **Slider** - 单值/范围模式，垂直方向，对数刻度，禁用状态
+Accordion、Alert、Avatar、Badge、Button、Calendar、Card、Checkbox、Color Picker、Divider、Drawer、Dropdown、Input、Label、Layout、Link、List、Modal、Notification、Page Flip、Popover、Progress、Radio、Skeleton、Slider、Spinner、Space、Switch、Tab、Table、Text、Tooltip。
 
-### 即将推出
+### Shell 集成
 
-- TextInput（文本输入）
-- Badge（徽章）
-- Tooltip（提示）
-- Spinner（加载动画）
-- Modal（模态框）
-- Dropdown（下拉菜单）
-- 更多...
+本库通过 `makepad_components::shell` 重新导出 `makepad-shell`，用于应用菜单、托盘图标和右键菜单。makepad-shell 仓库：https://github.com/Project-Robius-China/makepad-shell。完整示例见 `examples/shell-demo`。
 
 ## 安装
 
@@ -66,19 +54,33 @@
 
 ```toml
 [dependencies]
-makepad-component = { git = "https://github.com/ZhangHanDong/makepad-component", branch = "main" }
+makepad-components = { git = "https://github.com/Project-Robius-China/makepad-component", branch = "main", features = ["Button", "Checkbox", "Switch", "Slider"] }
 ```
+
+### Feature Flags
+
+所有组件都在 Cargo features 下，按需开启：
+
+```toml
+makepad-components = { git = "https://github.com/Project-Robius-China/makepad-component", branch = "main", features = ["Modal", "Button", "Input", "Tooltip"] }
+```
+
+说明：
+- 没有 `all` feature，需要手动列出。
+- `Modal` 依赖 `Button`（会自动启用）。
 
 ## 使用方法
 
 ```rust
 use makepad_widgets::*;
-use makepad_component::*;
 
 live_design! {
     use link::theme::*;
     use link::widgets::*;
-    use makepad_component::*;
+    use makepad_components::button::*;
+    use makepad_components::checkbox::*;
+    use makepad_components::slider::*;
+    use makepad_components::switch::*;
 
     App = {{App}} {
         ui: <Root> {
@@ -95,17 +97,43 @@ live_design! {
         }
     }
 }
+
+app_main!(App);
+
+#[derive(Live, LiveHook)]
+pub struct App {
+    #[live]
+    ui: WidgetRef,
+}
+
+impl LiveRegister for App {
+    fn live_register(cx: &mut Cx) {
+        makepad_widgets::live_design(cx);
+        cx.link(live_id!(theme), live_id!(theme_desktop_light));
+        cx.link(live_id!(theme_colors), live_id!(theme_colors_light));
+        makepad_components::live_design(cx);
+    }
+}
+
+impl AppMain for App {
+    fn handle_event(&mut self, cx: &mut Cx, event: &Event) {
+        self.ui.handle_event(cx, event, &mut Scope::empty());
+    }
+}
 ```
 
 ## 运行演示
 
 ```bash
 # 克隆仓库
-git clone https://github.com/ZhangHanDong/makepad-component
+git clone https://github.com/Project-Robius-China/makepad-component
 cd makepad-component
 
 # 运行组件动物园演示
 cargo run -p component-zoo
+
+# 运行 makepad-shell 演示（菜单/托盘/右键菜单）
+cargo run -p shell-demo
 ```
 
 ---
