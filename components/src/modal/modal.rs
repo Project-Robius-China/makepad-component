@@ -113,13 +113,15 @@ live_design! {
                 draw_bg: {
                     instance icon_color: #94a3b8
                     instance hover: 0.0
+                    instance down: 0.0
 
                     fn pixel(self) -> vec4 {
                         let sdf = Sdf2d::viewport(self.pos * self.rect_size);
                         let c = self.rect_size * 0.5;
                         let size = 6.0;
 
-                        let final_color = mix(self.icon_color, #64748b, self.hover);
+                        let hover_amount = max(self.hover, self.down * 0.6);
+                        let final_color = mix(self.icon_color, #64748b, hover_amount);
 
                         // X mark
                         sdf.move_to(c.x - size, c.y - size);
@@ -141,13 +143,24 @@ live_design! {
                             from: { all: Forward { duration: 0.15 } }
                             apply: { draw_bg: { hover: 0.0 } }
                         }
-                        on = {
-                            from: { all: Forward { duration: 0.1 } }
-                            apply: { draw_bg: { hover: 1.0 } }
-                        }
+                    on = {
+                        from: { all: Forward { duration: 0.1 } }
+                        apply: { draw_bg: { hover: 1.0 } }
+                    }
+                }
+                down = {
+                    default: off
+                    off = {
+                        from: { all: Forward { duration: 0.1 } }
+                        apply: { draw_bg: { down: 0.0 } }
+                    }
+                    on = {
+                        from: { all: Forward { duration: 0.05 } }
+                        apply: { draw_bg: { down: 1.0 } }
                     }
                 }
             }
+        }
         }
 
         body = <View> {
@@ -402,31 +415,20 @@ impl Widget for MpModalWidget {
 
         self.view.handle_event(cx, event, scope);
 
+        // Handle close button click (give it priority)
+        let close_btn = self.view.view(ids!(content.dialog.header.close));
+        if let Hit::FingerUp(fe) = event.hits_with_capture_overload(cx, close_btn.area(), true) {
+            if fe.is_over {
+                cx.widget_action(self.widget_uid(), &scope.path, MpModalAction::CloseRequested);
+            }
+        }
+
         // Handle backdrop click to close
         let backdrop = self.view.view(ids!(backdrop));
         if let Hit::FingerUp(fe) = event.hits(cx, backdrop.area()) {
             if fe.is_over {
                 cx.widget_action(self.widget_uid(), &scope.path, MpModalAction::CloseRequested);
             }
-        }
-
-        // Handle close button click
-        let close_btn = self.view.view(ids!(content.dialog.header.close));
-        match event.hits(cx, close_btn.area()) {
-            Hit::FingerHoverIn(_) => {
-                close_btn.apply_over(cx, live!{ draw_bg: { hover: 1.0 } });
-                close_btn.redraw(cx);
-            }
-            Hit::FingerHoverOut(_) => {
-                close_btn.apply_over(cx, live!{ draw_bg: { hover: 0.0 } });
-                close_btn.redraw(cx);
-            }
-            Hit::FingerUp(fe) => {
-                if fe.is_over {
-                    cx.widget_action(self.widget_uid(), &scope.path, MpModalAction::CloseRequested);
-                }
-            }
-            _ => {}
         }
     }
 

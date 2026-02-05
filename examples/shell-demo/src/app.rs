@@ -142,6 +142,8 @@ pub struct App {
 impl LiveRegister for App {
     fn live_register(cx: &mut Cx) {
         crate::makepad_widgets::live_design(cx);
+        cx.link(live_id!(theme), live_id!(theme_desktop_light));
+        cx.link(live_id!(theme_colors), live_id!(theme_colors_light));
         makepad_components::live_design(cx);
     }
 }
@@ -256,6 +258,17 @@ impl MatchEvent for App {
         self.install_app_menu();
         self.install_tray();
     }
+
+    fn handle_actions(&mut self, cx: &mut Cx, actions: &Actions) {
+        for action in actions {
+            if let Some(cmd) = action.downcast_ref::<ShellCommandAction>() {
+                self.apply_command(cx, cmd.0);
+            }
+            if let MpModalAction::CloseRequested = action.as_widget_action().cast() {
+                self.ui.mp_modal_widget(ids!(about_modal)).close(cx);
+            }
+        }
+    }
 }
 
 impl AppMain for App {
@@ -282,16 +295,6 @@ impl AppMain for App {
             }
         }
         self.install_tray();
-        if let Event::Actions(actions) = event {
-            for action in actions {
-                if let Some(cmd) = action.downcast_ref::<ShellCommandAction>() {
-                    self.apply_command(cx, cmd.0);
-                }
-                if let MpModalAction::CloseRequested = action.as_widget_action().cast() {
-                    self.ui.mp_modal_widget(ids!(about_modal)).close(cx);
-                }
-            }
-        }
         self.ui.handle_event(cx, event, &mut Scope::empty());
     }
 }
