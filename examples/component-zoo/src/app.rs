@@ -7,6 +7,7 @@ use makepad_components::card::MpCardAction;
 use makepad_components::checkbox::MpCheckboxWidgetRefExt;
 use makepad_components::color_picker::MpColorPickerWidgetRefExt;
 use makepad_components::drawer::MpDrawerWidgetWidgetRefExt;
+use makepad_components::menu::MpMenuItemWidgetRefExt;
 use makepad_components::modal::MpModalAction;
 use makepad_components::modal::MpModalWidgetWidgetRefExt;
 use makepad_components::notification::MpNotificationWidgetWidgetRefExt;
@@ -41,6 +42,7 @@ live_design! {
     use makepad_components::layout::*;
     use makepad_components::link::*;
     use makepad_components::list::*;
+    use makepad_components::menu::*;
     use makepad_components::modal::*;
     use makepad_components::notification::*;
     use makepad_components::page_flip::*;
@@ -2386,6 +2388,136 @@ live_design! {
 
                             <MpDivider> {}
 
+                            // ===== Menu Section =====
+                            <View> {
+                                width: Fill, height: Fit,
+                                flow: Down,
+                                spacing: 16,
+
+                                <SectionHeader> { text: "Menu" }
+
+                                <View> {
+                                    width: Fit, height: Fit,
+                                    flow: Right,
+                                    spacing: 24,
+                                    align: { y: 0.0 }
+
+                                    <View> {
+                                        width: Fit, height: Fit,
+                                        flow: Down,
+                                        spacing: 8,
+
+                                        <SubsectionLabel> { text: "Basic Navigation Menu" }
+
+                                        <MpMenu> {
+                                            width: 240
+
+                                            <MpMenuSection> { label = { text: "MAIN" } }
+                                            menu_item_dashboard = <MpMenuItem> {
+                                                text: "Dashboard", selected: true
+                                                draw_bg: { selected: 1.0 }
+                                                draw_text: { selected: 1.0 }
+                                            }
+                                            menu_item_projects = <MpMenuItem> { text: "Projects" }
+                                            menu_item_team = <MpMenuItem> { text: "Team" }
+                                            <MpMenuDivider> {}
+                                            <MpMenuSection> { label = { text: "WORKSPACE" } }
+                                            menu_item_calendar = <MpMenuItem> { text: "Calendar" }
+                                            menu_item_messages = <MpMenuItem> { text: "Messages" }
+                                            menu_item_help = <MpMenuItemDisabled> { text: "Help Center" }
+                                            <MpMenuDivider> {}
+                                            menu_item_sign_out = <MpMenuItemDanger> { text: "Sign Out" }
+                                        }
+                                    }
+
+                                    <View> {
+                                        width: Fit, height: Fit,
+                                        flow: Down,
+                                        spacing: 8
+
+                                        <SubsectionLabel> { text: "Expandable Submenu (Two Levels)" }
+
+                                        <MpMenu> {
+                                            width: 280
+
+                                            <MpMenuSection> { label = { text: "PRODUCT" } }
+                                            menu_tree_overview = <MpMenuItem> {
+                                                text: "Overview", selected: true
+                                                draw_bg: { selected: 1.0 }
+                                                draw_text: { selected: 1.0 }
+                                            }
+
+                                            menu_tree_docs_toggle = <MpMenuItem> { text: "▾ Documentation" }
+                                            menu_tree_docs_children = <View> {
+                                                width: Fill, height: Fit,
+                                                visible: true,
+                                                flow: Down,
+                                                spacing: 2,
+                                                margin: { left: 14 }
+
+                                                menu_tree_docs_getting_started = <MpMenuItem> { text: "Getting Started" }
+                                                menu_tree_docs_components = <MpMenuItem> { text: "Components" }
+                                                menu_tree_docs_api = <MpMenuItem> { text: "API Reference" }
+                                            }
+
+                                            menu_tree_settings_toggle = <MpMenuItem> { text: "▸ Settings" }
+                                            menu_tree_settings_children = <View> {
+                                                width: Fill, height: Fit,
+                                                visible: false,
+                                                flow: Down,
+                                                spacing: 2,
+                                                margin: { left: 14 }
+
+                                                menu_tree_settings_profile = <MpMenuItem> { text: "Profile" }
+                                                menu_tree_settings_security = <MpMenuItem> { text: "Security" }
+                                            }
+                                        }
+                                    }
+
+                                    <View> {
+                                        width: 320, height: Fit,
+                                        flow: Down,
+                                        spacing: 8,
+                                        padding: { top: 8 }
+
+                                        <SubsectionLabel> { text: "Interaction" }
+                                        <Label> {
+                                            width: Fill,
+                                            draw_text: {
+                                                text_style: <THEME_FONT_REGULAR>{ font_size: 13.0 }
+                                                color: (MUTED_FOREGROUND)
+                                                wrap: Word
+                                            }
+                                            text: "第二组是二级菜单示例：点击 Documentation / Settings 可展开或收缩子菜单，点击叶子节点会更新选中状态。"
+                                        }
+                                    }
+                                }
+
+                                <View> {
+                                    width: Fill, height: Fit,
+                                    flow: Down,
+                                    spacing: 4,
+
+                                    menu_status = <Label> {
+                                        draw_text: {
+                                            text_style: <THEME_FONT_REGULAR>{ font_size: 12.0 }
+                                            color: (MUTED_FOREGROUND)
+                                        }
+                                        text: "Selected: Dashboard"
+                                    }
+
+                                    menu_tree_status = <Label> {
+                                        draw_text: {
+                                            text_style: <THEME_FONT_REGULAR>{ font_size: 12.0 }
+                                            color: (MUTED_FOREGROUND)
+                                        }
+                                        text: "Tree Selected: Overview"
+                                    }
+                                }
+                            }
+
+                            <MpDivider> {}
+
                             // ===== PageFlip Section =====
                             <View> {
                                 width: Fill, height: Fit,
@@ -3935,12 +4067,17 @@ pub struct App {
     current_category: usize,
     #[rust]
     is_dark: bool,
+    #[rust]
+    menu_tree_docs_expanded: bool,
+    #[rust]
+    menu_tree_settings_expanded: bool,
 }
 
 impl LiveHook for App {
     fn after_apply(&mut self, cx: &mut Cx, _apply: &mut Apply, _index: usize, _nodes: &[LiveNode]) {
         self.sync_theme_ui(cx);
         self.sync_category_ui(cx);
+        self.sync_tree_menu_ui(cx);
     }
 }
 
@@ -3958,6 +4095,8 @@ impl MatchEvent for App {
         self.counter = 0;
         self.current_category = 0;
         self.is_dark = false;
+        self.menu_tree_docs_expanded = true;
+        self.menu_tree_settings_expanded = false;
 
         self.sync_theme_ui(cx);
 
@@ -3966,6 +4105,8 @@ impl MatchEvent for App {
 
         // Initialize skeleton in loading state
         self.ui.mp_skeleton_widget(ids!(interactive_skeleton)).set_loading(cx, true);
+        self.sync_tree_menu_ui(cx);
+
     }
 
     fn handle_actions(&mut self, cx: &mut Cx, actions: &Actions) {
@@ -4314,6 +4455,56 @@ impl MatchEvent for App {
         if self.ui.mp_tab(ids!(tab_s_map)).clicked(&actions) {
             self.select_tab(cx, "segmented", 2, "Map");
         }
+
+        // Handle Menu item clicks
+        if let Some(label) = self.ui.mp_menu_item(ids!(menu_item_dashboard)).clicked(&actions) {
+            self.select_nav_menu_item(cx, id!(menu_item_dashboard), &label);
+        }
+        if let Some(label) = self.ui.mp_menu_item(ids!(menu_item_projects)).clicked(&actions) {
+            self.select_nav_menu_item(cx, id!(menu_item_projects), &label);
+        }
+        if let Some(label) = self.ui.mp_menu_item(ids!(menu_item_team)).clicked(&actions) {
+            self.select_nav_menu_item(cx, id!(menu_item_team), &label);
+        }
+        if let Some(label) = self.ui.mp_menu_item(ids!(menu_item_calendar)).clicked(&actions) {
+            self.select_nav_menu_item(cx, id!(menu_item_calendar), &label);
+        }
+        if let Some(label) = self.ui.mp_menu_item(ids!(menu_item_messages)).clicked(&actions) {
+            self.select_nav_menu_item(cx, id!(menu_item_messages), &label);
+        }
+        if let Some(label) = self.ui.mp_menu_item(ids!(menu_item_sign_out)).clicked(&actions) {
+            self.select_nav_menu_item(cx, id!(menu_item_sign_out), &label);
+        }
+
+        // Handle Tree Menu toggles
+        if self.ui.mp_menu_item(ids!(menu_tree_docs_toggle)).clicked(&actions).is_some() {
+            self.menu_tree_docs_expanded = !self.menu_tree_docs_expanded;
+            self.sync_tree_menu_ui(cx);
+        }
+        if self.ui.mp_menu_item(ids!(menu_tree_settings_toggle)).clicked(&actions).is_some() {
+            self.menu_tree_settings_expanded = !self.menu_tree_settings_expanded;
+            self.sync_tree_menu_ui(cx);
+        }
+
+        // Handle Tree Menu leaf selection
+        if let Some(label) = self.ui.mp_menu_item(ids!(menu_tree_overview)).clicked(&actions) {
+            self.select_tree_menu_item(cx, id!(menu_tree_overview), &label);
+        }
+        if let Some(label) = self.ui.mp_menu_item(ids!(menu_tree_docs_getting_started)).clicked(&actions) {
+            self.select_tree_menu_item(cx, id!(menu_tree_docs_getting_started), &label);
+        }
+        if let Some(label) = self.ui.mp_menu_item(ids!(menu_tree_docs_components)).clicked(&actions) {
+            self.select_tree_menu_item(cx, id!(menu_tree_docs_components), &label);
+        }
+        if let Some(label) = self.ui.mp_menu_item(ids!(menu_tree_docs_api)).clicked(&actions) {
+            self.select_tree_menu_item(cx, id!(menu_tree_docs_api), &label);
+        }
+        if let Some(label) = self.ui.mp_menu_item(ids!(menu_tree_settings_profile)).clicked(&actions) {
+            self.select_tree_menu_item(cx, id!(menu_tree_settings_profile), &label);
+        }
+        if let Some(label) = self.ui.mp_menu_item(ids!(menu_tree_settings_security)).clicked(&actions) {
+            self.select_tree_menu_item(cx, id!(menu_tree_settings_security), &label);
+        }
     }
 }
 
@@ -4442,6 +4633,70 @@ impl App {
         }
 
         self.ui.label(ids!(tab_status)).set_text(cx, &format!("Selected: {}", label));
+        self.ui.redraw(cx);
+    }
+
+    fn select_nav_menu_item(&mut self, cx: &mut Cx, selected: LiveId, label: &str) {
+        self.ui.mp_menu_item(ids!(menu_item_dashboard)).set_selected(cx, selected == id!(menu_item_dashboard));
+        self.ui.mp_menu_item(ids!(menu_item_projects)).set_selected(cx, selected == id!(menu_item_projects));
+        self.ui.mp_menu_item(ids!(menu_item_team)).set_selected(cx, selected == id!(menu_item_team));
+        self.ui.mp_menu_item(ids!(menu_item_calendar)).set_selected(cx, selected == id!(menu_item_calendar));
+        self.ui.mp_menu_item(ids!(menu_item_messages)).set_selected(cx, selected == id!(menu_item_messages));
+        self.ui.mp_menu_item(ids!(menu_item_sign_out)).set_selected(cx, selected == id!(menu_item_sign_out));
+
+        self.ui.label(ids!(menu_status)).set_text(cx, &format!("Selected: {}", label));
+        self.ui.redraw(cx);
+    }
+
+    fn sync_tree_menu_ui(&mut self, cx: &mut Cx) {
+        self.ui
+            .view(ids!(menu_tree_docs_children))
+            .set_visible(cx, self.menu_tree_docs_expanded);
+        self.ui
+            .view(ids!(menu_tree_settings_children))
+            .set_visible(cx, self.menu_tree_settings_expanded);
+
+        self.ui.mp_menu_item(ids!(menu_tree_docs_toggle)).set_text(
+            cx,
+            if self.menu_tree_docs_expanded {
+                "▾ Documentation"
+            } else {
+                "▸ Documentation"
+            },
+        );
+        self.ui.mp_menu_item(ids!(menu_tree_settings_toggle)).set_text(
+            cx,
+            if self.menu_tree_settings_expanded {
+                "▾ Settings"
+            } else {
+                "▸ Settings"
+            },
+        );
+    }
+
+    fn select_tree_menu_item(&mut self, cx: &mut Cx, selected: LiveId, label: &str) {
+        self.ui
+            .mp_menu_item(ids!(menu_tree_overview))
+            .set_selected(cx, selected == id!(menu_tree_overview));
+        self.ui
+            .mp_menu_item(ids!(menu_tree_docs_getting_started))
+            .set_selected(cx, selected == id!(menu_tree_docs_getting_started));
+        self.ui
+            .mp_menu_item(ids!(menu_tree_docs_components))
+            .set_selected(cx, selected == id!(menu_tree_docs_components));
+        self.ui
+            .mp_menu_item(ids!(menu_tree_docs_api))
+            .set_selected(cx, selected == id!(menu_tree_docs_api));
+        self.ui
+            .mp_menu_item(ids!(menu_tree_settings_profile))
+            .set_selected(cx, selected == id!(menu_tree_settings_profile));
+        self.ui
+            .mp_menu_item(ids!(menu_tree_settings_security))
+            .set_selected(cx, selected == id!(menu_tree_settings_security));
+
+        self.ui
+            .label(ids!(menu_tree_status))
+            .set_text(cx, &format!("Tree Selected: {}", label));
         self.ui.redraw(cx);
     }
 }

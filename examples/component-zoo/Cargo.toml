@@ -24,6 +24,7 @@ makepad-components = { workspace = true, features = [
     "Layout",
     "Link",
     "List",
+    "Menu",
     "Modal",
     "Notification",
     "PageFlip",
