@@ -69,6 +69,39 @@ makepad-components = { git = "https://github.com/Project-Robius-China/makepad-co
 - 没有 `all` feature，需要手动列出。
 - `Modal` 依赖 `Button`（会自动启用）。
 
+### Makepad 版本兼容与冲突处理
+
+`makepad-components` 已经重新导出了 `makepad-widgets`。最稳妥的用法是只使用这一套类型来源：
+
+```rust
+use makepad_components::makepad_widgets::*;
+```
+
+如果你的项目同时直接依赖了 `makepad-widgets`，必须确保所有 crate 最终解析到同一个 Makepad 源和同一个 revision。否则即使类型名称相同，Rust 也会把它们视为不同类型并报错。
+
+推荐在 workspace 里统一依赖：
+
+```toml
+[workspace.dependencies]
+makepad-components = { git = "https://github.com/Project-Robius-China/makepad-component", rev = "YOUR_REV" }
+makepad-widgets    = { git = "https://github.com/Project-Robius-China/makepad", rev = "SAME_MAKEPAD_REV" }
+```
+
+如果传递依赖仍然拉入了另一套 Makepad 版本，可以再用 `patch` 强制收敛：
+
+```toml
+[patch."https://github.com/Project-Robius-China/makepad"]
+makepad-widgets = { git = "https://github.com/Project-Robius-China/makepad", rev = "SAME_MAKEPAD_REV" }
+```
+
+冲突排查命令：
+
+```bash
+cargo tree -d
+```
+
+只要看到重复的 `makepad-*` 包，就需要继续统一版本。
+
 ## 使用方法
 
 ```rust

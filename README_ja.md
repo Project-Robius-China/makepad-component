@@ -69,6 +69,39 @@ makepad-components = { git = "https://github.com/Project-Robius-China/makepad-co
 - `all` feature はありません。必要なコンポーネントを列挙してください。
 - `Modal` は `Button` に依存します（自動で有効化されます）。
 
+### Makepad バージョン互換性
+
+`makepad-components` は `makepad-widgets` を再エクスポートしています。最も安全な使い方は、アプリ側でこの 1 系統だけを使うことです。
+
+```rust
+use makepad_components::makepad_widgets::*;
+```
+
+もしプロジェクトで `makepad-widgets` を直接依存に追加する場合、すべての crate が同じ Makepad の source / revision に解決されるようにしてください。異なる revision が混在すると、同名でも別型として扱われ、型不一致エラーになります。
+
+推奨の workspace 設定：
+
+```toml
+[workspace.dependencies]
+makepad-components = { git = "https://github.com/Project-Robius-China/makepad-component", rev = "YOUR_REV" }
+makepad-widgets    = { git = "https://github.com/Project-Robius-China/makepad", rev = "SAME_MAKEPAD_REV" }
+```
+
+依存ツリーで別 revision が残る場合は、`patch` で収束させます：
+
+```toml
+[patch."https://github.com/Project-Robius-China/makepad"]
+makepad-widgets = { git = "https://github.com/Project-Robius-China/makepad", rev = "SAME_MAKEPAD_REV" }
+```
+
+重複確認コマンド：
+
+```bash
+cargo tree -d
+```
+
+`makepad-*` の重複が出たら、同一 revision へ統一してください。
+
 ## 使用方法
 
 ```rust

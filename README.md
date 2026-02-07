@@ -73,6 +73,39 @@ Notes:
 - There is no `all` feature; list the components you want.
 - `Modal` depends on `Button` (it is enabled automatically).
 
+### Makepad Version Compatibility
+
+`makepad-components` re-exports `makepad-widgets`, so the safest option is to use that single source in your app:
+
+```rust
+use makepad_components::makepad_widgets::*;
+```
+
+If your project also depends on `makepad-widgets` directly, make sure all crates resolve to the exact same Makepad source/revision. Otherwise Rust will treat them as different types and compilation will fail.
+
+Recommended workspace setup:
+
+```toml
+[workspace.dependencies]
+makepad-components = { git = "https://github.com/Project-Robius-China/makepad-component", rev = "YOUR_REV" }
+makepad-widgets    = { git = "https://github.com/Project-Robius-China/makepad", rev = "SAME_MAKEPAD_REV" }
+```
+
+If a transitive dependency still pulls another Makepad revision, pin it with `patch`:
+
+```toml
+[patch."https://github.com/Project-Robius-China/makepad"]
+makepad-widgets = { git = "https://github.com/Project-Robius-China/makepad", rev = "SAME_MAKEPAD_REV" }
+```
+
+To diagnose duplicates:
+
+```bash
+cargo tree -d
+```
+
+If duplicate `makepad-*` crates appear, unify them to one revision.
+
 ## Usage
 
 ```rust
