@@ -35,7 +35,6 @@ pub mod checkbox;
 pub mod calendar;
 
 #[cfg(feature = "ColorPicker")]
-#[path ="./color_picker/color_picker.rs"]
 pub mod color_picker;
 
 #[cfg(feature = "Divider")]

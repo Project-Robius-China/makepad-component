@@ -32,7 +32,7 @@ live_design! {
     use makepad_components::calendar::*;
     use makepad_components::card::*;
     use makepad_components::checkbox::*;
-    use makepad_components::color_picker::*;
+    use makepad_components::color_picker::color_picker::*;
     use makepad_components::divider::*;
     use makepad_components::dropdown::*;
     use makepad_components::drawer::*;
