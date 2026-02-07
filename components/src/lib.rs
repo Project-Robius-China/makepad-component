@@ -37,6 +37,9 @@ pub mod calendar;
 #[cfg(feature = "ColorPicker")]
 #[path ="./color_picker/color_picker.rs"]
 pub mod color_picker;
+#[cfg(feature = "ColorPicker")]
+#[path ="./fold_header_dropdown/fold_header_dropdown.rs"]
+pub mod fold_header_dropdown;
 
 #[cfg(feature = "Divider")]
 #[path ="./divider/divider.rs"]
@@ -154,6 +157,8 @@ pub fn live_design(cx: &mut Cx) {
     checkbox::live_design(cx);
     #[cfg(feature = "Calendar")]
     calendar::live_design(cx);
+    #[cfg(feature = "ColorPicker")]
+    fold_header_dropdown::live_design(cx);
     #[cfg(feature = "ColorPicker")]
     color_picker::live_design(cx);
     #[cfg(feature = "Divider")]
