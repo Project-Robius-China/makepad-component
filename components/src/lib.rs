@@ -70,6 +70,10 @@ pub mod link;
 #[path ="./list/list.rs"]
 pub mod list;
 
+#[cfg(feature = "Menu")]
+#[path ="./menu/menu.rs"]
+pub mod menu;
+
 #[cfg(feature = "Modal")]
 #[path ="./modal/modal.rs"]
 pub mod modal;
@@ -168,6 +172,8 @@ pub fn live_design(cx: &mut Cx) {
     link::live_design(cx);
     #[cfg(feature = "List")]
     list::live_design(cx);
+    #[cfg(feature = "Menu")]
+    menu::live_design(cx);
     #[cfg(feature = "Modal")]
     modal::live_design(cx);
     #[cfg(feature = "Notification")]
