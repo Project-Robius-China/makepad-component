@@ -382,12 +382,28 @@ live_design! {
                 }
                 padding: { top: 5, left: 12, right: 12, bottom: 12 },
                 spacing: 12,
-                close_button = <Button> {
-                    text: "Close",
-                    width: Fit,
+
+                // Top row with close button aligned right
+                <View> {
+                    width: Fill,
                     height: Fit,
-                    margin: {left: 10.0},
+                    flow: Right,
+                    align: { x: 1.0, y: 0.0 }
+
+                    close_button = <Button> {
+                        text: "Close",
+                        width: Fit,
+                        height: Fit,
+                        draw_bg: {
+                            color: #00000000
+                        }
+                        draw_text: {
+                            color: #64748b
+                            text_style: <THEME_FONT_BOLD> { font_size: 12.0 }
+                        }
+                    }
                 }
+
                 sv_picker = <MpSVPicker> {}
 
                 hue_slider = <MpHueSlider> {}
