@@ -382,6 +382,12 @@ live_design! {
                 }
                 padding: { top: 5, left: 12, right: 12, bottom: 12 },
                 spacing: 12,
+                close_button = <Button> {
+                    text: "Close",
+                    width: Fit,
+                    height: Fit,
+                    margin: {left: 10.0},
+                }
                 sv_picker = <MpSVPicker> {}
 
                 hue_slider = <MpHueSlider> {}
@@ -436,12 +442,7 @@ live_design! {
                         <MpPresetColor> { color: #ffffff }
                     }
                 }
-                close_button = <Button> {
-                    text: "Close",
-                    width: Fit,
-                    height: Fit,
-                    margin: {right: 10.0},
-                }
+                
             }
         }
     }

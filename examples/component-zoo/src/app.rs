@@ -656,7 +656,7 @@ live_design! {
                                             width: Fit, height: Fit,
                                             flow: Down,
                                             spacing: 8,
-
+                                            visible: false,
                                             <SubsectionLabel> { text: "Selected Color" }
 
                                             color_display = <View> {
