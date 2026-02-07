@@ -6,7 +6,7 @@ live_design! {
     use link::theme::*;
     use link::shaders::*;
     use link::widgets::*;
-    use crate::color_picker::fold_header_dropdown::*;
+    use crate::fold_header_dropdown::*;
     use link::theme_colors::*;
     // Hue slider - rainbow gradient
     MpHueSlider = {{MpHueSlider}} {
