@@ -12,7 +12,7 @@ live_design!{
 
         animator: {
             active = {
-                default: on
+                default: off
                 off = {
                     from: {all: Forward {duration: 0.2}}
                     ease: ExpDecay {d1: 0.96, d2: 0.97}
