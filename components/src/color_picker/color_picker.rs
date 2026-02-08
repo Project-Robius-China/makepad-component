@@ -1,12 +1,13 @@
 use makepad_widgets::*;
+use makepad_widgets::fold_button::FoldButtonAction;
 
 live_design! {
+    link widgets;
     use link::theme::*;
     use link::shaders::*;
     use link::widgets::*;
-
+    use crate::fold_header_dropdown::*;
     use link::theme_colors::*;
-
     // Hue slider - rainbow gradient
     MpHueSlider = {{MpHueSlider}} {
         width: Fill,
@@ -25,6 +26,87 @@ live_design! {
                 let h = self.pos.x;
                 let rgb = Pal::hsv2rgb(vec4(h, 1.0, 1.0, 1.0));
                 sdf.fill(rgb);
+
+                return sdf.result;
+            }
+        }
+
+        draw_thumb: {
+            instance hover: 0.0
+            instance pressed: 0.0
+
+            fn pixel(self) -> vec4 {
+                let sdf = Sdf2d::viewport(self.pos * self.rect_size);
+                let c = self.rect_size * 0.5;
+
+                // Shadow
+                sdf.circle(c.x + 1.0, c.y + 1.0, c.x - 2.0);
+                sdf.fill(vec4(0.0, 0.0, 0.0, 0.2));
+
+                // Main circle
+                sdf.circle(c.x, c.y, c.x - 2.0);
+                let color = mix(#ffffff, #f0f0f0, self.hover);
+                let color = mix(color, #e0e0e0, self.pressed);
+                sdf.fill(color);
+                sdf.stroke(#333333, 2.0);
+
+                return sdf.result;
+            }
+        }
+
+        animator: {
+            hover = {
+                default: off,
+                off = {
+                    from: { all: Forward { duration: 0.15 } }
+                    apply: { draw_thumb: { hover: 0.0 } }
+                }
+                on = {
+                    from: { all: Forward { duration: 0.1 } }
+                    apply: { draw_thumb: { hover: 1.0 } }
+                }
+            }
+            pressed = {
+                default: off,
+                off = {
+                    from: { all: Forward { duration: 0.2 } }
+                    apply: { draw_thumb: { pressed: 0.0 } }
+                }
+                on = {
+                    from: { all: Snap }
+                    apply: { draw_thumb: { pressed: 1.0 } }
+                }
+            }
+        }
+    }
+
+    // Alpha/transparency slider - checkerboard to color
+    MpAlphaSlider = {{MpAlphaSlider}} {
+        width: Fill,
+        height: 20,
+
+        draw_slider: {
+            instance slider_color: #ff0000
+
+            fn pixel(self) -> vec4 {
+                let sdf = Sdf2d::viewport(self.pos * self.rect_size);
+                let sz = self.rect_size;
+                let r = sz.y * 0.5;
+
+                // Draw rounded rect
+                sdf.box(0.0, 0.0, sz.x, sz.y, r);
+
+                // Checkerboard background
+                let checker_size = 6.0;
+                let cx = floor(self.pos.x * sz.x / checker_size);
+                let cy = floor(self.pos.y * sz.y / checker_size);
+                let checker = mod(cx + cy, 2.0);
+                let checker_color = mix(#ffffff, #cccccc, checker);
+
+                // Gradient from transparent (checkerboard) to opaque color
+                let alpha = self.pos.x;
+                let blended = mix(checker_color, self.slider_color, alpha);
+                sdf.fill(blended);
 
                 return sdf.result;
             }
@@ -172,15 +254,13 @@ live_design! {
 
                 // Draw rounded rect
                 sdf.box(1.0, 1.0, sz.x - 2.0, sz.y - 2.0, 4.0);
-                sdf.fill(checker_color);
 
                 // Overlay with actual color
                 let final_color = mix(checker_color, self.color, self.color.w);
                 sdf.fill(vec4(final_color.xyz, 1.0));
 
                 // Border
-                sdf.stroke(self.border_color, 1.0);
-
+                sdf.stroke(self.color, 1.0);
                 return sdf.result;
             }
         }
@@ -227,13 +307,10 @@ live_design! {
         }
     }
 
-    // Main ColorPicker component
+    // Main ColorPicker component with FoldHeader
     pub MpColorPicker = {{MpColorPicker}} {
         width: 280,
         height: Fit,
-        flow: Down,
-        padding: 12,
-        spacing: 12,
 
         show_bg: true,
         draw_bg: {
@@ -253,118 +330,135 @@ live_design! {
             }
         }
 
-        sv_picker = <MpSVPicker> {}
+        fold_header = <FoldHeaderDropDown> {
+            // Header: Color swatch + hex input (always visible)
+            header: <View> {
+                width: Fill,
+                height: Fit,
+                flow: Right,
+                spacing: 8,
+                padding: 12,
+                align: { y: 0.5 }
 
-        <View> {
-            width: Fill,
-            height: Fit,
-            flow: Right,
-            spacing: 12,
-            align: { y: 0.5 }
+                fold_button = <MpColorSwatch> {
+                    width: 32,
+                    height: 32,
+                }
 
-            color_preview = <MpColorSwatch> {
-                width: 48,
-                height: 48,
+                hex_input = <TextInput> {
+                    width: 110,
+                    height: 32,
+                    padding: { left: 8, right: 8 }
+                    text: "#FF0000"
+                    draw_bg: {
+                        color: #f8fafc
+                        instance border_color: #e2e8f0
+                        instance radius: 4.0
+
+                        fn pixel(self) -> vec4 {
+                            let sdf = Sdf2d::viewport(self.pos * self.rect_size);
+                            let sz = self.rect_size;
+                            sdf.box(0.5, 0.5, sz.x - 1.0, sz.y - 1.0, self.radius);
+                            sdf.fill(self.color);
+                            sdf.stroke(self.border_color, 1.0);
+                            return sdf.result;
+                        }
+                    }
+                    draw_text: {
+                        color: #0f172a
+                        text_style: <THEME_FONT_REGULAR> { font_size: 12.0 }
+                    }
+                }
             }
 
-            <View> {
+            // Body: Full color picker UI (collapsible)
+            body: <RoundedView> {
                 width: Fill,
                 height: Fit,
                 flow: Down,
-                spacing: 8,
+                show_bg: true,
+                draw_bg: {
+                    color: #cca4a4
+                }
+                padding: { top: 5, left: 12, right: 12, bottom: 12 },
+                spacing: 12,
 
-                hue_slider = <MpHueSlider> {}
-
+                // Top row with close button aligned right
                 <View> {
                     width: Fill,
                     height: Fit,
                     flow: Right,
-                    spacing: 4,
-                    align: { y: 0.5 }
+                    align: { x: 1.0, y: 0.0 }
 
-                    <Label> {
+                    close_button = <Button> {
+                        text: "Close",
                         width: Fit,
-                        text: "#"
+                        height: Fit,
+                        draw_bg: {
+                            color: #00000000
+                        }
                         draw_text: {
                             color: #64748b
-                            text_style: <THEME_FONT_REGULAR> { font_size: 12.0 }
+                            text_style: <THEME_FONT_BOLD> { font_size: 12.0 }
                         }
                     }
+                }
 
-                    hex_input = <TextInput> {
-                        width: Fill,
-                        height: 32,
-                        padding: { left: 8, right: 8 }
-                        text: "FF0000"
-                        draw_bg: {
-                            color: #f8fafc
-                            instance border_color: #e2e8f0
-                            instance radius: 4.0
+                sv_picker = <MpSVPicker> {}
 
-                            fn pixel(self) -> vec4 {
-                                let sdf = Sdf2d::viewport(self.pos * self.rect_size);
-                                let sz = self.rect_size;
-                                sdf.box(0.5, 0.5, sz.x - 1.0, sz.y - 1.0, self.radius);
-                                sdf.fill(self.color);
-                                sdf.stroke(self.border_color, 1.0);
-                                return sdf.result;
-                            }
-                        }
+                hue_slider = <MpHueSlider> {}
+
+                alpha_slider = <MpAlphaSlider> {}
+
+                // Preset colors section
+                <View> {
+                    width: Fill,
+                    height: Fit,
+                    flow: Down,
+                    spacing: 8,
+                    visible: false
+                    <Label> {
+                        width: Fit,
+                        text: "Presets"
                         draw_text: {
-                            color: #0f172a
-                            text_style: <THEME_FONT_REGULAR> { font_size: 12.0 }
+                            color: #64748b
+                            text_style: <THEME_FONT_REGULAR> { font_size: 11.0 }
                         }
                     }
+
+                    preset_colors = <View> {
+                        width: Fill,
+                        height: Fit,
+                        flow: Right,
+                        spacing: 4,
+                        
+                        <MpPresetColor> { color: #ef4444 }
+                        <MpPresetColor> { color: #f97316 }
+                        <MpPresetColor> { color: #eab308 }
+                        <MpPresetColor> { color: #22c55e }
+                        <MpPresetColor> { color: #14b8a6 }
+                        <MpPresetColor> { color: #3b82f6 }
+                        <MpPresetColor> { color: #8b5cf6 }
+                        <MpPresetColor> { color: #ec4899 }
+                    }
+
+                    preset_colors_2 = <View> {
+                        width: Fill,
+                        height: Fit,
+                        flow: Right,
+                        spacing: 4,
+
+                        <MpPresetColor> { color: #000000 }
+                        <MpPresetColor> { color: #374151 }
+                        <MpPresetColor> { color: #6b7280 }
+                        <MpPresetColor> { color: #9ca3af }
+                        <MpPresetColor> { color: #d1d5db }
+                        <MpPresetColor> { color: #e5e7eb }
+                        <MpPresetColor> { color: #f3f4f6 }
+                        <MpPresetColor> { color: #ffffff }
+                    }
                 }
-            }
-        }
-
-        // Preset colors section
-        <View> {
-            width: Fill,
-            height: Fit,
-            flow: Down,
-            spacing: 8,
-
-            <Label> {
-                width: Fit,
-                text: "Presets"
-                draw_text: {
-                    color: #64748b
-                    text_style: <THEME_FONT_REGULAR> { font_size: 11.0 }
-                }
-            }
-
-            preset_colors = <View> {
-                width: Fill,
-                height: Fit,
-                flow: Right,
-                spacing: 4,
-
-                <MpPresetColor> { draw_color: { color: #ef4444 } }
-                <MpPresetColor> { draw_color: { color: #f97316 } }
-                <MpPresetColor> { draw_color: { color: #eab308 } }
-                <MpPresetColor> { draw_color: { color: #22c55e } }
-                <MpPresetColor> { draw_color: { color: #14b8a6 } }
-                <MpPresetColor> { draw_color: { color: #3b82f6 } }
-                <MpPresetColor> { draw_color: { color: #8b5cf6 } }
-                <MpPresetColor> { draw_color: { color: #ec4899 } }
-            }
-
-            preset_colors_2 = <View> {
-                width: Fill,
-                height: Fit,
-                flow: Right,
-                spacing: 4,
-
-                <MpPresetColor> { draw_color: { color: #000000 } }
-                <MpPresetColor> { draw_color: { color: #374151 } }
-                <MpPresetColor> { draw_color: { color: #6b7280 } }
-                <MpPresetColor> { draw_color: { color: #9ca3af } }
-                <MpPresetColor> { draw_color: { color: #d1d5db } }
-                <MpPresetColor> { draw_color: { color: #e5e7eb } }
-                <MpPresetColor> { draw_color: { color: #f3f4f6 } }
-                <MpPresetColor> { draw_color: { color: #ffffff } }
+                
             }
         }
     }
@@ -374,20 +468,31 @@ live_design! {
 // Rust Implementation
 // ============================================================================
 
-/// HSV color representation
-#[derive(Clone, Copy, Debug, Default, PartialEq)]
+/// HSVA color representation
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Hsv {
     pub h: f32, // 0.0 - 1.0
     pub s: f32, // 0.0 - 1.0
     pub v: f32, // 0.0 - 1.0
+    pub a: f32, // 0.0 - 1.0
+}
+
+impl Default for Hsv {
+    fn default() -> Self {
+        Self { h: 0.0, s: 0.0, v: 0.0, a: 1.0 }
+    }
 }
 
 impl Hsv {
     pub fn new(h: f32, s: f32, v: f32) -> Self {
-        Self { h, s, v }
+        Self { h, s, v, a: 1.0 }
     }
 
-    pub fn to_rgb(&self) -> (f32, f32, f32) {
+    pub fn new_with_alpha(h: f32, s: f32, v: f32, a: f32) -> Self {
+        Self { h, s, v, a }
+    }
+
+    pub fn to_rgb(&self) -> (f32, f32, f32, f32) {
         let h = self.h * 6.0;
         let s = self.s;
         let v = self.v;
@@ -405,10 +510,10 @@ impl Hsv {
             _ => (c, 0.0, x),
         };
 
-        (r + m, g + m, b + m)
+        (r + m, g + m, b + m, self.a)
     }
 
-    pub fn from_rgb(r: f32, g: f32, b: f32) -> Self {
+    pub fn from_rgb(r: f32, g: f32, b: f32, a: f32) -> Self {
         let max = r.max(g).max(b);
         let min = r.min(g).min(b);
         let d = max - min;
@@ -426,34 +531,55 @@ impl Hsv {
         let s = if max == 0.0 { 0.0 } else { d / max };
         let v = max;
 
-        Self { h, s, v }
+        Self { h, s, v, a }
     }
 
     pub fn to_hex(&self) -> String {
-        let (r, g, b) = self.to_rgb();
-        format!(
-            "{:02X}{:02X}{:02X}",
-            (r * 255.0) as u8,
-            (g * 255.0) as u8,
-            (b * 255.0) as u8
-        )
+        let (r, g, b, a) = self.to_rgb();
+        if (a - 1.0).abs() < f32::EPSILON {
+            format!(
+                "{:02X}{:02X}{:02X}",
+                (r * 255.0) as u8,
+                (g * 255.0) as u8,
+                (b * 255.0) as u8
+            )
+        } else {
+            format!(
+                "{:02X}{:02X}{:02X}{:02X}",
+                (r * 255.0) as u8,
+                (g * 255.0) as u8,
+                (b * 255.0) as u8,
+                (a * 255.0) as u8
+            )
+        }
     }
 
     pub fn from_hex(hex: &str) -> Option<Self> {
         let hex = hex.trim_start_matches('#');
-        if hex.len() != 6 {
+        if hex.len() != 6 && hex.len() != 8 {
             return None;
         }
 
         let r = u8::from_str_radix(&hex[0..2], 16).ok()? as f32 / 255.0;
         let g = u8::from_str_radix(&hex[2..4], 16).ok()? as f32 / 255.0;
         let b = u8::from_str_radix(&hex[4..6], 16).ok()? as f32 / 255.0;
+        let a = if hex.len() == 8 {
+            u8::from_str_radix(&hex[6..8], 16).ok()? as f32 / 255.0
+        } else {
+            1.0
+        };
 
-        Some(Self::from_rgb(r, g, b))
+        Some(Self::from_rgb(r, g, b, a))
     }
 
     pub fn to_vec4(&self) -> Vec4 {
-        let (r, g, b) = self.to_rgb();
+        let (r, g, b, a) = self.to_rgb();
+        Vec4 { x: r, y: g, z: b, w: a }
+    }
+
+    /// Returns the opaque RGB as Vec4 (w = 1.0), ignoring alpha
+    pub fn to_rgb_vec4(&self) -> Vec4 {
+        let (r, g, b, _) = self.to_rgb();
         Vec4 { x: r, y: g, z: b, w: 1.0 }
     }
 }
@@ -594,6 +720,167 @@ impl MpHueSliderRef {
         if let Some(item) = actions.find_widget_action(self.widget_uid()) {
             if let MpHueSliderAction::Changed(hue) = item.cast() {
                 return Some(hue);
+            }
+        }
+        None
+    }
+}
+
+// ============================================================================
+// MpAlphaSlider
+// ============================================================================
+
+#[derive(Clone, Debug, DefaultNone)]
+pub enum MpAlphaSliderAction {
+    Changed(f32),
+    None,
+}
+
+#[derive(Live, LiveHook, Widget)]
+pub struct MpAlphaSlider {
+    #[redraw]
+    #[live]
+    draw_slider: DrawQuad,
+
+    #[live]
+    draw_thumb: DrawQuad,
+
+    #[animator]
+    animator: Animator,
+
+    #[walk]
+    walk: Walk,
+
+    #[live(1.0)]
+    alpha: f32,
+
+    #[rust]
+    slider_color: Vec4,
+
+    #[rust]
+    dragging: bool,
+
+    #[rust]
+    slider_area: Area,
+
+    #[rust]
+    thumb_area: Area,
+}
+
+impl Widget for MpAlphaSlider {
+    fn handle_event(&mut self, cx: &mut Cx, event: &Event, scope: &mut Scope) {
+        if self.animator_handle_event(cx, event).must_redraw() {
+            self.redraw(cx);
+        }
+
+        match event.hits(cx, self.slider_area) {
+            Hit::FingerHoverIn(_) => {
+                cx.set_cursor(MouseCursor::Hand);
+                self.animator_play(cx, ids!(hover.on));
+            }
+            Hit::FingerHoverOut(_) => {
+                if !self.dragging {
+                    self.animator_play(cx, ids!(hover.off));
+                }
+            }
+            Hit::FingerDown(fe) => {
+                self.dragging = true;
+                self.animator_play(cx, ids!(pressed.on));
+                self.update_alpha_from_position(cx, fe.abs, scope);
+            }
+            Hit::FingerMove(fe) => {
+                if self.dragging {
+                    self.update_alpha_from_position(cx, fe.abs, scope);
+                }
+            }
+            Hit::FingerUp(_) => {
+                self.dragging = false;
+                self.animator_play(cx, ids!(pressed.off));
+                self.animator_play(cx, ids!(hover.off));
+            }
+            _ => {}
+        }
+    }
+
+    fn draw_walk(&mut self, cx: &mut Cx2d, _scope: &mut Scope, walk: Walk) -> DrawStep {
+        let rect = cx.walk_turtle(walk);
+        let thumb_size = rect.size.y;
+
+        // Update color in shader
+        self.draw_slider.apply_over(cx, live! {
+            slider_color: (self.slider_color)
+        });
+
+        // Draw slider track
+        self.draw_slider.draw_abs(cx, rect);
+        self.slider_area = self.draw_slider.area();
+
+        // Draw thumb
+        let thumb_x = rect.pos.x + (rect.size.x - thumb_size) * self.alpha as f64;
+        let thumb_rect = Rect {
+            pos: DVec2 { x: thumb_x, y: rect.pos.y },
+            size: DVec2 { x: thumb_size, y: thumb_size },
+        };
+        self.draw_thumb.draw_abs(cx, thumb_rect);
+        self.thumb_area = self.draw_thumb.area();
+
+        DrawStep::done()
+    }
+}
+
+impl MpAlphaSlider {
+    fn update_alpha_from_position(&mut self, cx: &mut Cx, pos: DVec2, scope: &mut Scope) {
+        let rect = self.slider_area.rect(cx);
+        let thumb_radius = rect.size.y / 2.0;
+        let track_start = rect.pos.x + thumb_radius;
+        let track_width = rect.size.x - rect.size.y;
+
+        if track_width <= 0.0 {
+            return;
+        }
+
+        let relative_x = (pos.x - track_start).clamp(0.0, track_width);
+        let new_alpha = (relative_x / track_width) as f32;
+
+        if (new_alpha - self.alpha).abs() > f32::EPSILON {
+            self.alpha = new_alpha;
+            cx.widget_action(
+                self.widget_uid(),
+                &scope.path,
+                MpAlphaSliderAction::Changed(self.alpha),
+            );
+            self.redraw(cx);
+        }
+    }
+
+    pub fn set_alpha(&mut self, cx: &mut Cx, alpha: f32) {
+        self.alpha = alpha.clamp(0.0, 1.0);
+        self.redraw(cx);
+    }
+
+    pub fn set_color(&mut self, cx: &mut Cx, color: Vec4) {
+        self.slider_color = color;
+        self.redraw(cx);
+    }
+}
+
+impl MpAlphaSliderRef {
+    pub fn set_alpha(&self, cx: &mut Cx, alpha: f32) {
+        if let Some(mut inner) = self.borrow_mut() {
+            inner.set_alpha(cx, alpha);
+        }
+    }
+
+    pub fn set_color(&self, cx: &mut Cx, color: Vec4) {
+        if let Some(mut inner) = self.borrow_mut() {
+            inner.set_color(cx, color);
+        }
+    }
+
+    pub fn changed(&self, actions: &Actions) -> Option<f32> {
+        if let Some(item) = actions.find_widget_action(self.widget_uid()) {
+            if let MpAlphaSliderAction::Changed(alpha) = item.cast() {
+                return Some(alpha);
             }
         }
         None
@@ -787,9 +1074,24 @@ pub struct MpColorSwatch {
 }
 
 impl Widget for MpColorSwatch {
-    fn handle_event(&mut self, _cx: &mut Cx, _event: &Event, _scope: &mut Scope) {}
+    fn handle_event(&mut self, cx: &mut Cx, event: &Event, scope: &mut Scope) {
+        match event.hits(cx, self.area) {
+            Hit::FingerHoverIn(_) => {
+                cx.set_cursor(MouseCursor::Hand);
+            }
+            Hit::FingerDown(_) => {
+                cx.widget_action(
+                    self.widget_uid(),
+                    &scope.path,
+                    FoldButtonAction::Opening,
+                );
+            }
+            _ => {}
+        }
+    }
 
     fn draw_walk(&mut self, cx: &mut Cx2d, _scope: &mut Scope, walk: Walk) -> DrawStep {
+        
         self.draw_swatch.draw_walk(cx, walk);
         self.area = self.draw_swatch.area();
         DrawStep::done()
@@ -870,6 +1172,9 @@ impl Widget for MpPresetColor {
     }
 
     fn draw_walk(&mut self, cx: &mut Cx2d, _scope: &mut Scope, walk: Walk) -> DrawStep {
+        self.draw_color.apply_over(cx, live! {
+            color: (self.color)
+        });
         self.draw_color.draw_walk(cx, walk);
         self.area = self.draw_color.area();
         DrawStep::done()
@@ -895,17 +1200,26 @@ impl MpPresetColorRef {
 pub enum MpColorPickerAction {
     Changed(Hsv),
     None,
+    Error(String),
 }
 
-#[derive(Live, LiveHook, Widget)]
+#[derive(Live, Widget)]
 pub struct MpColorPicker {
     #[deref]
     view: View,
 
     #[rust]
     hsv: Hsv,
-}
 
+    #[rust]
+    fold_button_widget_uid: Option<WidgetUid>
+}
+impl LiveHook for MpColorPicker {
+    fn after_new_from_doc(&mut self, _cx: &mut Cx) {
+        // Adapt the preview based on the available space.
+        self.fold_button_widget_uid = Some(self.view.widget(ids!(fold_button)).widget_uid());
+    }
+}
 impl Widget for MpColorPicker {
     fn handle_event(&mut self, cx: &mut Cx, event: &Event, scope: &mut Scope) {
         self.view.handle_event(cx, event, scope);
@@ -921,13 +1235,15 @@ impl WidgetMatchEvent for MpColorPicker {
     fn handle_actions(&mut self, cx: &mut Cx, actions: &Actions, scope: &mut Scope) {
         let sv_picker = self.view.mp_svpicker(ids!(sv_picker));
         let hue_slider = self.view.mp_hue_slider(ids!(hue_slider));
-        let color_preview = self.view.mp_color_swatch(ids!(color_preview));
+        let alpha_slider = self.view.mp_alpha_slider(ids!(alpha_slider));
+        let color_preview = self.view.mp_color_swatch(ids!(fold_button));
         let hex_input = self.view.text_input(ids!(hex_input));
 
         // Handle hue slider changes
         if let Some(hue) = hue_slider.changed(actions) {
             self.hsv.h = hue;
             sv_picker.set_hue(cx, hue);
+            alpha_slider.set_color(cx, self.hsv.to_rgb_vec4());
             self.update_preview_and_input(cx, &color_preview, &hex_input);
             self.emit_change(cx, scope);
         }
@@ -936,11 +1252,19 @@ impl WidgetMatchEvent for MpColorPicker {
         if let Some((s, v)) = sv_picker.changed(actions) {
             self.hsv.s = s;
             self.hsv.v = v;
+            alpha_slider.set_color(cx, self.hsv.to_rgb_vec4());
             self.update_preview_and_input(cx, &color_preview, &hex_input);
             self.emit_change(cx, scope);
         }
 
-        // Handle preset color clicks - iterate through all actions
+        // Handle alpha slider changes
+        if let Some(a) = alpha_slider.changed(actions) {
+            self.hsv.a = a;
+            self.update_preview_and_input(cx, &color_preview, &hex_input);
+            self.emit_change(cx, scope);
+        }
+
+        // Handle preset color clicks
         for action in actions {
             if let MpPresetColorAction::Clicked(color) = action.cast() {
                 self.set_color_from_vec4(cx, color);
@@ -951,14 +1275,27 @@ impl WidgetMatchEvent for MpColorPicker {
 
         // Handle hex input changes
         if let Some(text) = hex_input.changed(actions) {
-            if let Some(hsv) = Hsv::from_hex(&text) {
+            let parse_text:Vec<&str> = text.split("#").collect();
+            if parse_text.len() != 2 {
+                cx.action(MpColorPickerAction::Error(String::from("Invalid Hex input")));
+                return;
+            }
+            let text = parse_text[1];
+            if let Some(hsv) = Hsv::from_hex(text) {
                 self.hsv = hsv;
                 hue_slider.set_hue(cx, hsv.h);
                 sv_picker.set_hue(cx, hsv.h);
                 sv_picker.set_sv(cx, hsv.s, hsv.v);
+                alpha_slider.set_color(cx, hsv.to_rgb_vec4());
+                alpha_slider.set_alpha(cx, hsv.a);
                 color_preview.set_color(cx, hsv.to_vec4());
                 self.emit_change(cx, scope);
             }
+        }
+        if self.button(ids!(close_button)).clicked(actions) {
+            if let Some(widget_uid) = self.fold_button_widget_uid {
+                cx.widget_action(widget_uid, &scope.path, FoldButtonAction::Closing);
+            }            
         }
     }
 }
@@ -971,7 +1308,7 @@ impl MpColorPicker {
         hex_input: &TextInputRef,
     ) {
         color_preview.set_color(cx, self.hsv.to_vec4());
-        hex_input.set_text(cx, &self.hsv.to_hex());
+        hex_input.set_text(cx, &format!("#{}",&self.hsv.to_hex()));
     }
 
     fn emit_change(&self, cx: &mut Cx, scope: &mut Scope) {
@@ -983,7 +1320,7 @@ impl MpColorPicker {
     }
 
     fn set_color_from_vec4(&mut self, cx: &mut Cx, color: Vec4) {
-        let hsv = Hsv::from_rgb(color.x, color.y, color.z);
+        let hsv = Hsv::from_rgb(color.x, color.y, color.z, color.w);
         self.set_color(cx, hsv);
     }
 
@@ -992,12 +1329,15 @@ impl MpColorPicker {
 
         let sv_picker = self.view.mp_svpicker(ids!(sv_picker));
         let hue_slider = self.view.mp_hue_slider(ids!(hue_slider));
-        let color_preview = self.view.mp_color_swatch(ids!(color_preview));
+        let alpha_slider = self.view.mp_alpha_slider(ids!(alpha_slider));
+        let color_preview = self.view.mp_color_swatch(ids!(fold_button));
         let hex_input = self.view.text_input(ids!(hex_input));
 
         hue_slider.set_hue(cx, hsv.h);
         sv_picker.set_hue(cx, hsv.h);
         sv_picker.set_sv(cx, hsv.s, hsv.v);
+        alpha_slider.set_color(cx, hsv.to_rgb_vec4());
+        alpha_slider.set_alpha(cx, hsv.a);
         color_preview.set_color(cx, hsv.to_vec4());
         hex_input.set_text(cx, &hsv.to_hex());
     }
