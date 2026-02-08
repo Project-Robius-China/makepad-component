@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
 
     // Menu container
     pub MpMenu = <View> {
@@ -20,7 +21,7 @@ live_design! {
             instance bg_color: (CARD)
             instance border_color: (BORDER)
             instance border_width: 1.0
-            instance radius: 8.0
+            instance radius: (RADIUS_SMALL)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
@@ -85,7 +86,7 @@ live_design! {
             instance selected: 0.0
             instance disabled: 0.0
 
-            uniform radius: 6.0
+            uniform radius: (RADIUS_SMALL)
             uniform color: #00000000
             uniform color_hover: (SECONDARY)
             uniform color_selected: (PRIMARY)

@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
 
     // ============================================================
     // MpSkeleton - Loading placeholder component with shimmer animation
@@ -40,7 +41,7 @@ live_design! {
 
         show_bg: true
         draw_bg: {
-            instance radius: 4.0
+            instance radius: (RADIUS_SMALL)
 
             uniform color_base: #e5e7eb
             uniform color_shimmer: #f3f4f6
@@ -99,14 +100,14 @@ live_design! {
     pub MpSkeletonText = <MpSkeletonRounded> {
         width: Fill
         height: 16
-        draw_bg: { radius: 2.0 }
+        draw_bg: { radius: (RADIUS_SMALL) }
     }
 
     // Title skeleton
     pub MpSkeletonTitle = <MpSkeletonRounded> {
         width: 200
         height: 24
-        draw_bg: { radius: 4.0 }
+        draw_bg: { radius: (RADIUS_SMALL) }
     }
 
     // Paragraph skeleton
@@ -145,7 +146,7 @@ live_design! {
 
         draw_bg: {
             color: (CARD)
-            border_radius: 8.0
+            border_radius: (RADIUS_SMALL)
             border_color: (BORDER)
         }
 

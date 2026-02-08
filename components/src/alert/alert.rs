@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
 
     // ============================================================
     // Alert Icons - SDF drawn icons for each variant
@@ -240,7 +241,7 @@ live_design! {
         show_bg: true
         draw_bg: {
             instance bg_color: #f1f5f920
-            instance border_radius: 8.0
+            instance border_radius: (RADIUS_SMALL)
             instance border_color: (BORDER)
 
             fn pixel(self) -> vec4 {
@@ -426,7 +427,7 @@ live_design! {
         align: { y: 0.5 }
 
         draw_bg: {
-            border_radius: 0.0
+            border_radius: (RADIUS_NONE)
         }
     }
 
