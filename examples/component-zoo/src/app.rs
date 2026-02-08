@@ -37,6 +37,7 @@ live_design! {
     use makepad_components::divider::*;
     use makepad_components::dropdown::*;
     use makepad_components::drawer::*;
+    use makepad_components::flexible_data_table::*;
     use makepad_components::input::*;
     use makepad_components::label::*;
     use makepad_components::layout::*;
@@ -143,7 +144,17 @@ live_design! {
                             theme_label = <SubsectionLabel> { text: "Light" }
                         }
                     }
-
+                    <View> {
+                        width: Fill, height: Fit,
+                        flow: Down,
+                        padding: { left: 24, right: 24, top: 24, bottom: 16 },
+                        spacing: 8,
+                        <SubsectionLabel> { text: "FlexibleDataTable" }
+                        <FlexibleDataTable> {
+                            width: Fill,
+                            height: 500,
+                        }
+                    }
                     // Category Tab Bar
                     <View> {
                         width: Fill, height: Fit,

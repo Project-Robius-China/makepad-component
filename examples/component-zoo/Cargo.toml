@@ -19,6 +19,7 @@ makepad-components = { workspace = true, features = [
     "Divider",
     "Dropdown",
     "Drawer",
+    "FlexibleDataTable",
     "Input",
     "Label",
     "Layout",
