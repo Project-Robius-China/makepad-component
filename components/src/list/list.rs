@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
 
     // ============================================================
     // MpList - List container and item components
@@ -26,7 +27,7 @@ live_design! {
 
         draw_bg: {
             color: (CARD)
-            border_radius: 8.0
+            border_radius: (RADIUS_MEDIUM)
             border_color: (BORDER)
         }
     }

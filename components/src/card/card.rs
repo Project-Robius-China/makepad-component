@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
 
     // ============================================================
     // MpCard - Card container component
@@ -21,7 +22,7 @@ live_design! {
 
         draw_bg: {
             color: (CARD)
-            border_radius: 8.0
+            border_radius: (RADIUS_SMALL)
         }
     }
 
@@ -36,7 +37,7 @@ live_design! {
         show_bg: true
         draw_bg: {
             instance bg_color: (CARD)
-            instance border_radius: 8.0
+            instance border_radius: (RADIUS_SMALL)
             instance shadow_color: #0000001A
             instance shadow_offset_x: 0.0
             instance shadow_offset_y: 2.0
@@ -81,7 +82,7 @@ live_design! {
         draw_bg: {
             instance bg_color: (CARD)
             instance bg_color_hover: #f8fafc
-            instance border_radius: 8.0
+            instance border_radius: (RADIUS_SMALL)
             instance border_color: (BORDER)
             instance hover: 0.0
 
@@ -129,7 +130,7 @@ live_design! {
 
         draw_bg: {
             color: #00000000
-            border_radius: 8.0
+            border_radius: (RADIUS_SMALL)
             border_color: (BORDER)
         }
     }
@@ -206,7 +207,7 @@ live_design! {
 
         draw_bg: {
             color: (CARD)
-            border_radius: 6.0
+            border_radius: (RADIUS_SMALL)
         }
     }
 
@@ -220,7 +221,7 @@ live_design! {
 
         draw_bg: {
             color: (CARD)
-            border_radius: 12.0
+            border_radius: (RADIUS_SMALL)
         }
     }
 
@@ -238,7 +239,7 @@ live_design! {
 
         draw_bg: {
             color: (PRIMARY)
-            border_radius: 8.0
+            border_radius: (RADIUS_SMALL)
         }
     }
 
@@ -252,7 +253,7 @@ live_design! {
 
         draw_bg: {
             color: #fef2f2
-            border_radius: 8.0
+            border_radius: (RADIUS_SMALL)
             border_color: #fecaca
         }
     }
@@ -267,7 +268,7 @@ live_design! {
 
         draw_bg: {
             color: #f0fdf4
-            border_radius: 8.0
+            border_radius: (RADIUS_SMALL)
             border_color: #bbf7d0
         }
     }
@@ -282,7 +283,7 @@ live_design! {
 
         draw_bg: {
             color: #fffbeb
-            border_radius: 8.0
+            border_radius: (RADIUS_SMALL)
             border_color: #fde68a
         }
     }
@@ -297,7 +298,7 @@ live_design! {
 
         draw_bg: {
             color: #ecfeff
-            border_radius: 8.0
+            border_radius: (RADIUS_SMALL)
             border_color: #a5f3fc
         }
     }
@@ -318,7 +319,7 @@ live_design! {
         draw_bg: {
             instance bg_color: (CARD)
             instance bg_color_hover: #f8fafc
-            instance border_radius: 8.0
+            instance border_radius: (RADIUS_SMALL)
             instance border_color: (BORDER)
             instance hover: 0.0
 

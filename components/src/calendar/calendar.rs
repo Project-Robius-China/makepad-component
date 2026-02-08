@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use crate::theme::colors::*;
+    use crate::theme::radius::*;
 
     // Week day label
     CalendarWeekLabel = <View> {
@@ -94,7 +95,7 @@ live_design! {
 
         show_bg: true
         draw_bg: {
-            instance radius: 6.0
+            instance radius: (RADIUS_SMALL)
             instance hover: 0.0
             instance down: 0.0
             instance bg_color: (TRANSPARENT)
@@ -142,7 +143,7 @@ live_design! {
 
         show_bg: true
         draw_bg: {
-            instance radius: 6.0
+            instance radius: (RADIUS_SMALL)
             instance hover: 0.0
             instance down: 0.0
             instance bg_color: (TRANSPARENT)
@@ -189,7 +190,7 @@ live_design! {
 
         show_bg: true
         draw_bg: {
-            instance radius: 6.0
+            instance radius: (RADIUS_SMALL)
             instance hover: 0.0
             instance down: 0.0
             instance selected: 0.0
@@ -239,7 +240,7 @@ live_design! {
 
         show_bg: true
         draw_bg: {
-            instance radius: 6.0
+            instance radius: (RADIUS_SMALL)
             instance hover: 0.0
             instance down: 0.0
             instance selected: 0.0
@@ -291,7 +292,7 @@ live_design! {
 
         show_bg: true
         draw_bg: {
-            instance radius: 8.0
+            instance radius: (RADIUS_MEDIUM)
             instance border_width: 1.0
             instance border_color: (BORDER)
             instance bg_color: (CARD)

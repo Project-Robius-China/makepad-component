@@ -4,6 +4,7 @@ live_design! {
     use link::theme::*;
     use link::shaders::*;
     use link::widgets::*;
+    use crate::theme::radius::*;
 
     // Default style dropdown with light theme popup
     pub MpDropdown = <DropDownFlat> {
@@ -27,7 +28,7 @@ live_design! {
 
         draw_bg: {
             border_size: 1.0
-            border_radius: 6.0
+            border_radius: (RADIUS_SMALL)
             color_dither: 0.0
 
             color: #FFFFFF
@@ -60,7 +61,7 @@ live_design! {
                 color: #FFFFFFFF
                 border_color: #d4d4d4
                 border_color_2: #d4d4d4
-                border_radius: 6.0
+                border_radius: (RADIUS_MEDIUM)
             }
 
             menu_item: <PopupMenuItem> {
@@ -103,7 +104,7 @@ live_design! {
 
         draw_bg: {
             border_size: 1.0
-            border_radius: 4.0
+            border_radius: (RADIUS_SMALL)
             color_dither: 0.0
 
             color: #FFFFFF
@@ -136,7 +137,7 @@ live_design! {
                 color: #FFFFFFFF
                 border_color: #d4d4d4
                 border_color_2: #d4d4d4
-                border_radius: 6.0
+                border_radius: (RADIUS_MEDIUM)
             }
 
             menu_item: <PopupMenuItem> {
@@ -179,7 +180,7 @@ live_design! {
 
         draw_bg: {
             border_size: 1.0
-            border_radius: 8.0
+            border_radius: (RADIUS_SMALL)
             color_dither: 0.0
 
             color: #FFFFFF
@@ -212,7 +213,7 @@ live_design! {
                 color: #FFFFFFFF
                 border_color: #d4d4d4
                 border_color_2: #d4d4d4
-                border_radius: 6.0
+                border_radius: (RADIUS_MEDIUM)
             }
 
             menu_item: <PopupMenuItem> {
@@ -255,7 +256,7 @@ live_design! {
 
         draw_bg: {
             border_size: 0.0
-            border_radius: 6.0
+            border_radius: (RADIUS_SMALL)
             color_dither: 0.0
 
             color: #00000000
@@ -288,7 +289,7 @@ live_design! {
                 color: #FFFFFFFF
                 border_color: #d4d4d4
                 border_color_2: #d4d4d4
-                border_radius: 6.0
+                border_radius: (RADIUS_MEDIUM)
             }
 
             menu_item: <PopupMenuItem> {
@@ -331,7 +332,7 @@ live_design! {
 
         draw_bg: {
             border_size: 1.0
-            border_radius: 6.0
+            border_radius: (RADIUS_SMALL)
             color_dither: 0.0
 
             color: #00000000
@@ -364,7 +365,7 @@ live_design! {
                 color: #FFFFFFFF
                 border_color: #d4d4d4
                 border_color_2: #d4d4d4
-                border_radius: 6.0
+                border_radius: (RADIUS_MEDIUM)
             }
 
             menu_item: <PopupMenuItem> {
@@ -407,7 +408,7 @@ live_design! {
 
         draw_bg: {
             border_size: 0.0
-            border_radius: 6.0
+            border_radius: (RADIUS_SMALL)
             color_dither: 0.0
 
             color: #f5f5f5
@@ -440,7 +441,7 @@ live_design! {
                 color: #FFFFFFFF
                 border_color: #d4d4d4
                 border_color_2: #d4d4d4
-                border_radius: 6.0
+                border_radius: (RADIUS_MEDIUM)
             }
 
             menu_item: <PopupMenuItem> {
@@ -483,7 +484,7 @@ live_design! {
 
         draw_bg: {
             border_size: 0.0
-            border_radius: 6.0
+            border_radius: (RADIUS_SMALL)
             color_dither: 0.0
 
             color: #0284c7
@@ -516,7 +517,7 @@ live_design! {
                 color: #FFFFFFFF
                 border_color: #d4d4d4
                 border_color_2: #d4d4d4
-                border_radius: 6.0
+                border_radius: (RADIUS_MEDIUM)
             }
 
             menu_item: <PopupMenuItem> {
@@ -559,7 +560,7 @@ live_design! {
 
         draw_bg: {
             border_size: 0.0
-            border_radius: 6.0
+            border_radius: (RADIUS_SMALL)
             color_dither: 0.0
 
             color: #dc2626
@@ -592,7 +593,7 @@ live_design! {
                 color: #FFFFFFFF
                 border_color: #d4d4d4
                 border_color_2: #d4d4d4
-                border_radius: 6.0
+                border_radius: (RADIUS_MEDIUM)
             }
 
             menu_item: <PopupMenuItem> {

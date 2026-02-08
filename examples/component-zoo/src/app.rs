@@ -179,6 +179,101 @@ live_design! {
                             show_bg: true
                             draw_bg: { color: (MUTED) }
 
+                            // ===== Radius Playground Section =====
+                            <View> {
+                                width: Fill, height: Fit,
+                                flow: Down,
+                                spacing: 16,
+
+                                <SectionHeader> { text: "Radius Playground" }
+
+                                <SubsectionLabel> {
+                                    text: "Drag slider to preview corner radius across multiple components"
+                                }
+
+                                <View> {
+                                    width: Fill, height: Fit,
+                                    flow: Right,
+                                    spacing: 16,
+                                    align: { y: 0.5 }
+
+                                    radius_demo_slider = <MpSlider> {
+                                        width: 320,
+                                        min: 0.0, max: 16.0, value: 2.0, step: 1.0,
+                                    }
+
+                                    radius_demo_label = <Label> {
+                                        width: 100, height: Fit,
+                                        draw_text: {
+                                            text_style: <THEME_FONT_REGULAR>{ font_size: 14.0 }
+                                            color: (FOREGROUND)
+                                        }
+                                        text: "Radius: 2px"
+                                    }
+                                }
+
+                                <View> {
+                                    width: Fill, height: Fit,
+                                    flow: Right,
+                                    spacing: 16,
+                                    align: { y: 0.5 }
+
+                                    radius_demo_button = <MpButtonPrimary> { text: "Primary Button" }
+
+                                    radius_demo_input = <MpInput> {
+                                        width: 220,
+                                        empty_text: "Input preview"
+                                    }
+
+                                    radius_demo_dropdown = <MpDropdown> {
+                                        width: 180,
+                                        labels: ["Radius Demo", "Option 2", "Option 3"]
+                                    }
+                                }
+
+                                <View> {
+                                    width: Fill, height: Fit,
+                                    flow: Right,
+                                    spacing: 16,
+                                    align: { y: 0.0 }
+
+                                    radius_demo_card = <MpCard> {
+                                        width: 260,
+                                        <Label> {
+                                            draw_text: {
+                                                text_style: <THEME_FONT_BOLD>{ font_size: 14.0 }
+                                                color: (FOREGROUND)
+                                            }
+                                            text: "Card Preview"
+                                        }
+                                        <Label> {
+                                            draw_text: {
+                                                text_style: <THEME_FONT_REGULAR>{ font_size: 13.0 }
+                                                color: (MUTED_FOREGROUND)
+                                            }
+                                            text: "Card corner radius follows slider value."
+                                        }
+                                    }
+
+                                    radius_demo_popover = <MpPopoverBase> {
+                                        width: 220,
+                                        padding: 10,
+                                        flow: Down,
+                                        spacing: 4,
+
+                                        radius_demo_menu_item = <MpPopoverMenuItem> {
+                                            label = { text: "Popover Item" }
+                                        }
+
+                                        <MpPopoverMenuItemDanger> {
+                                            label = { text: "Danger Item" }
+                                        }
+                                    }
+                                }
+                            }
+
+                            <MpDivider> {}
+
                             // ===== Button Section =====
                             <View> {
                                 width: Fill, height: Fit,
@@ -4071,6 +4166,8 @@ pub struct App {
     menu_tree_docs_expanded: bool,
     #[rust]
     menu_tree_settings_expanded: bool,
+    #[rust]
+    radius_demo_value: f64,
 }
 
 impl LiveHook for App {
@@ -4078,6 +4175,7 @@ impl LiveHook for App {
         self.sync_theme_ui(cx);
         self.sync_category_ui(cx);
         self.sync_tree_menu_ui(cx);
+        self.sync_radius_demo_ui(cx);
     }
 }
 
@@ -4097,6 +4195,7 @@ impl MatchEvent for App {
         self.is_dark = false;
         self.menu_tree_docs_expanded = true;
         self.menu_tree_settings_expanded = false;
+        self.radius_demo_value = 2.0;
 
         self.sync_theme_ui(cx);
 
@@ -4106,6 +4205,7 @@ impl MatchEvent for App {
         // Initialize skeleton in loading state
         self.ui.mp_skeleton_widget(ids!(interactive_skeleton)).set_loading(cx, true);
         self.sync_tree_menu_ui(cx);
+        self.sync_radius_demo_ui(cx);
 
     }
 
@@ -4220,6 +4320,13 @@ impl MatchEvent for App {
             let new_value = (current - 10.0).max(0.0);
             self.ui.mp_progress(ids!(interactive_progress)).set_value(cx, new_value);
             self.ui.label(ids!(progress_label)).set_text(cx, &format!("{}%", new_value as i32));
+        }
+
+        // Handle radius playground slider
+        if let Some(value) = self.ui.mp_slider(ids!(radius_demo_slider)).changed(&actions) {
+            let radius = value.end().round().clamp(0.0, 16.0);
+            self.radius_demo_value = radius;
+            self.apply_radius_demo(cx, radius);
         }
 
         // Handle slider changes
@@ -4514,6 +4621,38 @@ impl App {
         self.ui
             .label(ids!(theme_label))
             .set_text(cx, if self.is_dark { "Dark" } else { "Light" });
+    }
+
+    fn sync_radius_demo_ui(&mut self, cx: &mut Cx) {
+        self.ui
+            .mp_slider(ids!(radius_demo_slider))
+            .set_single_value(cx, self.radius_demo_value);
+        self.apply_radius_demo(cx, self.radius_demo_value);
+    }
+
+    fn apply_radius_demo(&mut self, cx: &mut Cx, radius: f64) {
+        self.ui
+            .label(ids!(radius_demo_label))
+            .set_text(cx, &format!("Radius: {}px", radius as i32));
+
+        self.ui.widget(ids!(radius_demo_button)).apply_over(cx, live! {
+            draw_bg: { radius: (radius) }
+        });
+        self.ui.widget(ids!(radius_demo_input)).apply_over(cx, live! {
+            draw_bg: { border_radius: (radius) }
+        });
+        self.ui.widget(ids!(radius_demo_dropdown)).apply_over(cx, live! {
+            draw_bg: { border_radius: (radius) }
+        });
+        self.ui.widget(ids!(radius_demo_card)).apply_over(cx, live! {
+            draw_bg: { border_radius: (radius) }
+        });
+        self.ui.widget(ids!(radius_demo_popover)).apply_over(cx, live! {
+            draw_bg: { border_radius: (radius) }
+        });
+        self.ui.widget(ids!(radius_demo_menu_item)).apply_over(cx, live! {
+            draw_bg: { border_radius: (radius) }
+        });
     }
 
     fn sync_category_ui(&mut self, cx: &mut Cx) {

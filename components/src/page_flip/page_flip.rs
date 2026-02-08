@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
 
     // ============================================================
     // MpPageFlip - Page switching container
@@ -70,7 +71,7 @@ live_design! {
 
         draw_bg: {
             color: (CARD)
-            border_radius: 8.0
+            border_radius: (RADIUS_MEDIUM)
             border_width: 1.0
             border_color: (BORDER)
         }
