@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
 
     // Base button component
     pub MpButton = {{MpButton}} {
@@ -15,7 +16,7 @@ live_design! {
         padding: { left: 16, right: 16, top: 8, bottom: 8 }
 
         draw_bg: {
-            instance radius: 6.0
+            instance radius: (RADIUS_SMALL)
             instance border_width: 1.0
             instance border_color: #0000
             instance hover: 0.0

@@ -8,6 +8,7 @@ live_design! {
     use link::widgets::*;
     use crate::fold_header_dropdown::*;
     use link::theme_colors::*;
+    use crate::theme::radius::*;
     // Hue slider - rainbow gradient
     MpHueSlider = {{MpHueSlider}} {
         width: Fill,
@@ -316,7 +317,7 @@ live_design! {
         draw_bg: {
             color: #ffffff
             instance border_color: #e2e8f0
-            instance radius: 8.0
+            instance radius: (RADIUS_SMALL)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
@@ -353,7 +354,7 @@ live_design! {
                     draw_bg: {
                         color: #f8fafc
                         instance border_color: #e2e8f0
-                        instance radius: 4.0
+                        instance radius: (RADIUS_SMALL)
 
                         fn pixel(self) -> vec4 {
                             let sdf = Sdf2d::viewport(self.pos * self.rect_size);

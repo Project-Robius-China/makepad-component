@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use crate::theme::colors::*;
+    use crate::theme::radius::*;
 
     // ============================================================
     // MpTableCell - Basic table cell with label
@@ -127,7 +128,7 @@ live_design! {
 
         show_bg: true
         draw_bg: {
-            instance radius: 6.0
+            instance radius: (RADIUS_MEDIUM)
             instance border_width: 1.0
             instance border_color: (BORDER)
             instance bg_color: (CARD)
