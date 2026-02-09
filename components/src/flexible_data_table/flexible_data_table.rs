@@ -1,3 +1,94 @@
+//! # FlexibleDataTable
+//!
+//! A configurable data table widget with support for multiple cell types.
+//!
+//! ## Features
+//! - Up to 10 columns
+//! - Three cell types: DropDown, TextInput, ColorPicker
+//! - DSL configuration for columns, rows, and hidden cells
+//! - Add/remove rows dynamically
+//! - Per-cell visibility control
+//!
+//! ## DSL Usage
+//!
+//! ```rust
+//! <FlexibleDataTable> {
+//!     width: Fill,
+//!     height: Fit,
+//!     initial_rows: 2,
+//!     live_columns: [
+//!         { name: "Status", cell_type: DropDown, width: 120.0, dropdown_labels: "Active,Inactive,Pending" },
+//!         { name: "Description", cell_type: TextInput, width: 200.0 },
+//!         { name: "Color", cell_type: ColorPicker, width: 150.0 },
+//!     ],
+//!     live_hidden_cells: [
+//!         { row: 0, col: 1 },  // Hide cell at row 0, column 1
+//!     ]
+//! }
+//! ```
+//!
+//! ## DSL Properties
+//!
+//! | Property | Type | Default | Description |
+//! |----------|------|---------|-------------|
+//! | `initial_rows` | i64 | 1 | Number of rows to create initially |
+//! | `live_columns` | Array | default 3 cols | Column configurations |
+//! | `live_hidden_cells` | Array | [] | Cells to hide |
+//!
+//! ## Column Configuration (LiveColumnConfig)
+//!
+//! | Field | Type | Default | Description |
+//! |-------|------|---------|-------------|
+//! | `name` | String | "" | Column header text |
+//! | `cell_type` | CellType | TextInput | `DropDown`, `TextInput`, or `ColorPicker` |
+//! | `width` | f64 | 150.0 | Column width in pixels |
+//! | `dropdown_labels` | String | "" | Comma-separated options for DropDown cells |
+//!
+//! ## Hidden Cell Configuration (LiveHiddenCell)
+//!
+//! | Field | Type | Default | Description |
+//! |-------|------|---------|-------------|
+//! | `row` | i64 | 0 | Row index (0-based) |
+//! | `col` | i64 | 0 | Column index (0-based) |
+//!
+//! ## Rust API
+//!
+//! ```rust
+//! // Get table reference
+//! let table = self.ui.flexible_data_table(id!(my_table));
+//!
+//! // Add a row
+//! table.add_row(cx);
+//!
+//! // Set cell value
+//! table.set_cell(cx, row_idx, col_idx, CellValue::Text("Hello".to_string()));
+//!
+//! // Hide a cell
+//! table.add_hidden_cell(cx, row_idx, col_idx);
+//!
+//! // Check for changes
+//! if let Some((row, col, value)) = table.cell_changed(&actions) {
+//!     // Handle cell change
+//! }
+//!
+//! // Check if add row was clicked
+//! if table.add_row_clicked(&actions) {
+//!     // Handle add row
+//! }
+//!
+//! // Check if minus row was clicked
+//! if let Some(removed_idx) = table.minus_row_clicked(&actions) {
+//!     // Handle row removal
+//! }
+//! ```
+//!
+//! ## Actions
+//!
+//! The table emits `FlexibleDataTableAction`:
+//! - `CellChanged(row, col, value)` - A cell value was changed
+//! - `AddRowClicked` - The add row button was clicked
+//! - `MinusRowClicked(row_idx)` - A row's minus button was clicked
+
 use makepad_widgets::*;
 use crate::color_picker::*;
 
