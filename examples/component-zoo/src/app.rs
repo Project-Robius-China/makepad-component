@@ -144,17 +144,6 @@ live_design! {
                             theme_label = <SubsectionLabel> { text: "Light" }
                         }
                     }
-                    <View> {
-                        width: Fill, height: Fit,
-                        flow: Down,
-                        padding: { left: 24, right: 24, top: 24, bottom: 16 },
-                        spacing: 8,
-                        <SubsectionLabel> { text: "FlexibleDataTable" }
-                        <FlexibleDataTable> {
-                            width: Fill,
-                            height: 500,
-                        }
-                    }
                     // Category Tab Bar
                     <View> {
                         width: Fill, height: Fit,
@@ -3397,7 +3386,7 @@ live_design! {
                             width: Fill, height: Fill,
                             flow: Down,
                             spacing: 24,
-                            padding: { left: 24, right: 24, top: 24, bottom: 100 }
+                            padding: { left: 24, right: 24, top: 24, bottom: 400 }
 
                             show_bg: true
                             draw_bg: { color: (MUTED) }
@@ -3799,6 +3788,22 @@ live_design! {
                                         }
                                         text: "Clicked: 0 times"
                                     }
+                                }
+                            }
+
+                            <MpDivider> {}
+
+                            // ===== FlexibleDataTable Section =====
+                            <View> {
+                                width: Fill, height: Fit,
+                                flow: Down,
+                                spacing: 16,
+
+                                <SectionHeader> { text: "FlexibleDataTable" }
+
+                                <FlexibleDataTable> {
+                                    width: Fill,
+                                    height: Fit,
                                 }
                             }
                         }
