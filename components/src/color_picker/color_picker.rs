@@ -8,6 +8,7 @@ live_design! {
     use link::widgets::*;
     use crate::fold_header_dropdown::*;
     use link::theme_colors::*;
+    use crate::theme::radius::*;
     // Hue slider - rainbow gradient
     MpHueSlider = {{MpHueSlider}} {
         width: Fill,
@@ -316,7 +317,7 @@ live_design! {
         draw_bg: {
             color: #ffffff
             instance border_color: #e2e8f0
-            instance radius: 8.0
+            instance radius: (RADIUS_SMALL)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
@@ -337,23 +338,23 @@ live_design! {
                 height: Fit,
                 flow: Right,
                 spacing: 8,
-                padding: 5,
+                padding: 12,
                 align: { y: 0.5 }
 
                 fold_button = <MpColorSwatch> {
-                    width: 20,
-                    height: 20,
+                    width: 32,
+                    height: 32,
                 }
 
                 hex_input = <TextInput> {
-                    width: 80,
-                    height: 20,
+                    width: 110,
+                    height: 32,
                     padding: { left: 8, right: 8 }
                     text: "#FF0000"
                     draw_bg: {
                         color: #f8fafc
                         instance border_color: #e2e8f0
-                        instance radius: 4.0
+                        instance radius: (RADIUS_SMALL)
 
                         fn pixel(self) -> vec4 {
                             let sdf = Sdf2d::viewport(self.pos * self.rect_size);

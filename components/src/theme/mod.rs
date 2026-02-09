@@ -1,11 +1,13 @@
 pub mod colors;
 pub mod colors_dark;
+pub mod radius;
 
 use makepad_widgets::*;
 
 pub fn live_design(cx: &mut Cx) {
     crate::theme::colors::live_design(cx);
     crate::theme::colors_dark::live_design(cx);
+    crate::theme::radius::live_design(cx);
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]

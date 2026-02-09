@@ -4,6 +4,7 @@ live_design! {
     use link::theme::*;
     use link::shaders::*;
     use link::widgets::*;
+    use crate::theme::radius::*;
 
     // Icon paths
     ICON_SEARCH = dep("crate://self/resources/icons/search.svg")
@@ -25,7 +26,7 @@ live_design! {
             instance focus: 0.0
             instance disabled: 0.0
 
-            uniform border_radius: 6.0
+            uniform border_radius: (RADIUS_SMALL)
             uniform border_width: 1.0
 
             // Colors
@@ -181,7 +182,7 @@ live_design! {
         padding: { left: 8, right: 8, top: 6, bottom: 6 }
 
         draw_bg: {
-            uniform border_radius: 4.0
+            uniform border_radius: (RADIUS_SMALL)
         }
 
         draw_text: {
@@ -196,7 +197,7 @@ live_design! {
         padding: { left: 16, right: 16, top: 14, bottom: 14 }
 
         draw_bg: {
-            uniform border_radius: 8.0
+            uniform border_radius: (RADIUS_SMALL)
         }
 
         draw_text: {
@@ -221,7 +222,7 @@ live_design! {
             instance hover: 0.0
             instance focus: 0.0
 
-            uniform border_radius: 6.0
+            uniform border_radius: (RADIUS_SMALL)
             uniform border_width: 1.0
 
             uniform bg_color: #FFFFFF

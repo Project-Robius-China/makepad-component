@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
     use crate::button::*;
 
     // ============================================================
@@ -50,7 +51,7 @@ live_design! {
         show_bg: true
         draw_bg: {
             instance bg_color: (CARD)
-            instance border_radius: 12.0
+            instance border_radius: (RADIUS_MEDIUM)
             instance border_color: (BORDER)
             instance shadow_color: #00000033
             instance shadow_offset_y: 8.0

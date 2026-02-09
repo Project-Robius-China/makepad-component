@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
 
     // ============================================
     // Font Size Constants
@@ -114,7 +115,7 @@ live_design! {
         show_bg: true,
         draw_bg: {
             instance color: (MUTED)
-            instance radius: 4.0
+            instance radius: (RADIUS_SMALL)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);

@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
 
     // ============================================================
     // MpTab - Individual tab item (clickable)
@@ -24,7 +25,7 @@ live_design! {
             instance hover: 0.0
             instance selected: 0.0
 
-            uniform border_radius: 0.0
+            uniform border_radius: (RADIUS_NONE)
             uniform border_width: 0.0
 
             uniform color: #00000000
@@ -130,7 +131,7 @@ live_design! {
             color_selected: #ffffff
 
             border_width: 1.0
-            border_radius: 6.0
+            border_radius: (RADIUS_SMALL)
             border_color: #00000000
             border_color_selected: #e2e8f0
         }
@@ -186,7 +187,7 @@ live_design! {
         padding: { left: 16, right: 16, top: 6, bottom: 6 }
 
         draw_bg: {
-            border_radius: 6.0
+            border_radius: (RADIUS_SMALL)
             border_width: 1.0
 
             color: #00000000
@@ -219,7 +220,7 @@ live_design! {
         padding: { left: 16, right: 16, top: 8, bottom: 8 }
 
         draw_bg: {
-            border_radius: 6.0
+            border_radius: (RADIUS_SMALL)
             border_width: 0.0
 
             color: #00000000
@@ -242,7 +243,7 @@ live_design! {
         padding: { left: 16, right: 16, top: 6, bottom: 6 }
 
         draw_bg: {
-            border_radius: 4.0
+            border_radius: (RADIUS_SMALL)
             border_width: 0.0
 
             color: #00000000
@@ -270,7 +271,7 @@ live_design! {
         show_bg: true
         draw_bg: {
             color: #f1f5f9
-            instance radius: 8.0
+            instance radius: (RADIUS_SMALL)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
@@ -317,7 +318,7 @@ live_design! {
         show_bg: true
         draw_bg: {
             color: #f1f5f9
-            instance radius: 8.0
+            instance radius: (RADIUS_SMALL)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);

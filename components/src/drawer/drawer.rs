@@ -16,6 +16,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
 
     // ============================================================
     // MpDrawer - Drawer component
@@ -46,7 +47,7 @@ live_design! {
         show_bg: true
         draw_bg: {
             instance bg_color: (CARD)
-            instance border_radius: 12.0
+            instance border_radius: (RADIUS_NONE)
             instance border_color: (BORDER)
             instance shadow_color: #x00000026
             instance shadow_offset_x: 0.0

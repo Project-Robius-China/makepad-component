@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
 
     // ============================================================
     // MpAvatar - Avatar/profile picture component
@@ -144,7 +145,7 @@ live_design! {
         show_bg: true
         draw_bg: {
             instance bg_color: (MUTED)
-            instance radius: 6.0
+            instance radius: (RADIUS_MEDIUM)
 
             fn pixel(self) -> vec4 {
                 let sdf = Sdf2d::viewport(self.pos * self.rect_size);
@@ -180,7 +181,7 @@ live_design! {
         height: (AVATAR_SIZE_SM)
 
         draw_bg: {
-            radius: 4.0
+            radius: (RADIUS_MEDIUM)
         }
 
         label = <Label> {
@@ -195,7 +196,7 @@ live_design! {
         height: (AVATAR_SIZE_LG)
 
         draw_bg: {
-            radius: 8.0
+            radius: (RADIUS_MEDIUM)
         }
 
         label = <Label> {

@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
 
     TOOLTIP_BG = #1f2937
     TOOLTIP_BORDER = #374151
@@ -21,7 +22,7 @@ live_design! {
         draw_bg: {
             instance bg_color: (TOOLTIP_BG)
             instance border_color: (TOOLTIP_BORDER)
-            instance radius: 6.0
+            instance radius: (RADIUS_SMALL)
             instance arrow_dir: 0.0
             instance arrow_size: vec2(12.0, 6.0)
             instance arrow_pos: vec2(0.0, 0.0)
@@ -133,7 +134,7 @@ live_design! {
         height: Fit,
         flow: Overlay,
         popup_padding: { left: 8, right: 8, top: 5, bottom: 5 }
-        popup_radius: 6.0
+        popup_radius: (RADIUS_SMALL)
         arrow_size: vec2(12.0, 6.0)
         arrow_offset: 0.0
         gap: 2.0

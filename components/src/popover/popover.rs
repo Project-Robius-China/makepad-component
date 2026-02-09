@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
 
     // ============================================================
     // MpPopover - Popover/Dropdown panel component
@@ -20,7 +21,7 @@ live_design! {
         show_bg: true
         draw_bg: {
             instance bg_color: (CARD)
-            instance border_radius: 8.0
+            instance border_radius: (RADIUS_MEDIUM)
             instance border_color: (BORDER)
             instance shadow_color: #0000001A
             instance shadow_offset_y: 4.0
@@ -182,7 +183,7 @@ live_design! {
         draw_bg: {
             instance bg_color: #00000000
             instance bg_color_hover: #f1f5f9
-            instance border_radius: 4.0
+            instance border_radius: (RADIUS_SMALL)
             instance hover: 0.0
 
             fn pixel(self) -> vec4 {
@@ -355,7 +356,7 @@ live_design! {
         draw_bg: {
             instance bg_color: #00000000
             instance bg_color_hover: #f1f5f9
-            instance border_radius: 4.0
+            instance border_radius: (RADIUS_SMALL)
             instance hover: 0.0
 
             fn pixel(self) -> vec4 {

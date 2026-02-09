@@ -6,6 +6,7 @@ live_design! {
     use link::widgets::*;
 
     use link::theme_colors::*;
+    use crate::theme::radius::*;
 
     // ============================================================
     // MpNotification - Toast/notification component
@@ -23,7 +24,7 @@ live_design! {
         show_bg: true
         draw_bg: {
             instance bg_color: (CARD)
-            instance border_radius: 8.0
+            instance border_radius: (RADIUS_MEDIUM)
             instance border_color: (BORDER)
             instance shadow_color: #0000001A
             instance shadow_offset_y: 4.0
@@ -494,7 +495,7 @@ live_design! {
         show_bg: true
         draw_bg: {
             instance bg_color: (CARD)
-            instance border_radius: 8.0
+            instance border_radius: (RADIUS_MEDIUM)
             instance border_color: (BORDER)
             instance shadow_color: #0000001A
             instance shadow_offset_y: 4.0
