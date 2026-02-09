@@ -169,15 +169,82 @@ live_design! {
     }
 }
 
-/// Cell type for each column
-#[derive(Clone, Debug, PartialEq)]
+/// Cell type for each column (Live-compatible for DSL)
+#[derive(Live, LiveHook, LiveRegister, Clone, Debug, PartialEq)]
+#[live_ignore]
 pub enum CellType {
+    #[pick]
     /// A dropdown with selectable options
     DropDown,
     /// A text input field
     TextInput,
     /// A color picker
     ColorPicker,
+}
+
+/// Live-compatible column configuration for DSL
+#[derive(Live, LiveHook, LiveRegister, Clone, Debug)]
+#[live_ignore]
+pub struct LiveColumnConfig {
+    /// Column header name
+    #[live]
+    pub name: String,
+    /// Type of cell: DropDown, TextInput, or ColorPicker
+    #[live]
+    pub cell_type: CellType,
+    /// Width of the column in pixels
+    #[live(150.0)]
+    pub width: f64,
+    /// Options for dropdown cells (comma-separated labels)
+    #[live]
+    pub dropdown_labels: String,
+}
+
+impl Default for LiveColumnConfig {
+    fn default() -> Self {
+        Self {
+            name: String::new(),
+            cell_type: CellType::TextInput,
+            width: 150.0,
+            dropdown_labels: String::new(),
+        }
+    }
+}
+
+impl LiveColumnConfig {
+    /// Get dropdown labels as a Vec<String>
+    pub fn get_dropdown_labels(&self) -> Vec<String> {
+        if self.dropdown_labels.is_empty() {
+            Vec::new()
+        } else {
+            self.dropdown_labels.split(',').map(|s| s.trim().to_string()).collect()
+        }
+    }
+}
+
+/// Live-compatible hidden cell configuration for DSL
+#[derive(Live, LiveHook, LiveRegister, Clone, Debug)]
+#[live_ignore]
+pub struct LiveHiddenCell {
+    /// Row index
+    #[live(0)]
+    pub row: i64,
+    /// Column index
+    #[live(0)]
+    pub col: i64,
+}
+
+impl Default for LiveHiddenCell {
+    fn default() -> Self {
+        Self { row: 0, col: 0 }
+    }
+}
+
+impl LiveHiddenCell {
+    /// Convert to (usize, usize) tuple
+    pub fn to_tuple(&self) -> (usize, usize) {
+        (self.row.max(0) as usize, self.col.max(0) as usize)
+    }
 }
 
 /// Configuration for a single column
@@ -289,7 +356,7 @@ pub struct FlexRow {
 
 impl FlexRow {
     /// Create a new row with default values for each column
-    pub fn new(columns: &[ColumnConfig]) -> Self {
+    pub fn new(columns: &[LiveColumnConfig]) -> Self {
         let cells = columns
             .iter()
             .map(|col| CellValue::default_for_type(&col.cell_type))
@@ -329,27 +396,55 @@ pub struct FlexibleDataTable {
     #[deref]
     view: View,
 
-    /// Column configurations
-    #[rust]
-    columns: Vec<ColumnConfig>,
+    /// Column configurations (set via DSL)
+    #[live]
+    live_columns: Vec<LiveColumnConfig>,
+
+    /// Number of initial rows to create
+    #[live(1)]
+    initial_rows: i64,
+
+    /// Hidden cells configuration (set via DSL)
+    #[live]
+    live_hidden_cells: Vec<LiveHiddenCell>,
 
     /// Row data
     #[rust]
     rows: Vec<FlexRow>,
-
-    /// Cells where the dropdown/textinput/colorpicker views should be hidden
-    /// Each tuple is (row_index, column_index)
-    #[rust]
-    hidden_cells: Vec<(usize, usize)>,
 }
+
 impl LiveHook for FlexibleDataTable {
-    fn after_new_from_doc(&mut self, _cx:&mut Cx) {
-        self.columns = vec![
-            ColumnConfig::dropdown("Name", vec!["one".to_string(), "two".to_string(), "three".to_string()], 100.0),
-            ColumnConfig::text_input("Textinput", 100.0),
-            ColumnConfig::color_picker("ColorPicker", 150.0),
-        ];
-        self.rows = vec![FlexRow::new(&self.columns)];
+    //fn after_new_from_doc(&mut self, _cx: &mut Cx, _apply: &mut Apply, _index: usize, _nodes: &[LiveNode]) {
+    fn after_new_from_doc(&mut self, _cx: &mut Cx) {
+        // Only initialize once
+        if self.live_columns.is_empty() {
+            self.live_columns = vec![
+                LiveColumnConfig {
+                    name: "Name".to_string(),
+                    cell_type: CellType::DropDown,
+                    width: 100.0,
+                    dropdown_labels: "one,two,three".to_string(),
+                },
+                LiveColumnConfig {
+                    name: "Text".to_string(),
+                    cell_type: CellType::TextInput,
+                    width: 100.0,
+                    dropdown_labels: String::new(),
+                },
+                LiveColumnConfig {
+                    name: "Color".to_string(),
+                    cell_type: CellType::ColorPicker,
+                    width: 150.0,
+                    dropdown_labels: String::new(),
+                },
+            ];
+        }
+
+        // Create initial rows
+        for _ in 0..self.initial_rows.max(0) as usize {
+            self.rows.push(FlexRow::new(&self.live_columns));
+        }
+        
     }
 }
 
@@ -429,7 +524,7 @@ impl WidgetMatchEvent for FlexibleDataTable {
             }
 
             // Check each column for changes
-            for (col_idx, col_config) in self.columns.iter().enumerate() {
+            for (col_idx, col_config) in self.live_columns.iter().enumerate() {
                 if col_idx >= MAX_COLUMNS {
                     break;
                 }
@@ -509,11 +604,11 @@ impl FlexibleDataTable {
     fn setup_headers(&mut self, cx: &mut Cx) {
         for i in 0..MAX_COLUMNS {
             let header = self.view.label(HEADER_IDS[i]);
-            if i < self.columns.len() {
-                header.set_text(cx, &self.columns[i].name);
+            if i < self.live_columns.len() {
+                header.set_text(cx, &self.live_columns[i].name);
                 header.set_visible(cx, true);
                 header.apply_over(cx, live! {
-                    width: (self.columns[i].width)
+                    width: (self.live_columns[i].width)
                 });
             } else {
                 header.set_visible(cx, false);
@@ -523,7 +618,7 @@ impl FlexibleDataTable {
 
     /// Check if a cell is in the hidden list
     fn is_cell_hidden(&self, row_idx: usize, col_idx: usize) -> bool {
-        self.hidden_cells.contains(&(row_idx, col_idx))
+        self.live_hidden_cells.iter().any(|hc| hc.row as usize == row_idx && hc.col as usize == col_idx)
     }
 
     /// Draw cells for a single row
@@ -533,8 +628,8 @@ impl FlexibleDataTable {
         for col_idx in 0..MAX_COLUMNS {
             let cell = row_widget.view(CELL_IDS[col_idx]);
 
-            if col_idx < self.columns.len() {
-                let col_config = &self.columns[col_idx];
+            if col_idx < self.live_columns.len() {
+                let col_config = &self.live_columns[col_idx];
                 let cell_value = row_data.get(col_idx);
 
                 // Set cell width and make visible
@@ -565,7 +660,7 @@ impl FlexibleDataTable {
                             text_input_view.set_visible(cx, false);
                             color_picker.set_visible(cx, false);
 
-                            dropdown.set_labels(cx, col_config.dropdown_labels.clone());
+                            dropdown.set_labels(cx, col_config.get_dropdown_labels());
                             if let Some(CellValue::DropDown(idx)) = cell_value {
                                 dropdown.set_selected_item(cx, *idx);
                             }
@@ -599,26 +694,26 @@ impl FlexibleDataTable {
     }
 
     /// Set the column configuration
-    pub fn set_columns(&mut self, columns: Vec<ColumnConfig>) {
-        self.columns = columns;
+    pub fn set_columns(&mut self, columns: Vec<LiveColumnConfig>) {
+        self.live_columns = columns;
         // Clear existing rows since column structure changed
         self.rows.clear();
     }
 
     /// Get the column configuration
-    pub fn get_columns(&self) -> &[ColumnConfig] {
-        &self.columns
+    pub fn get_columns(&self) -> &[LiveColumnConfig] {
+        &self.live_columns
     }
 
     /// Add a new empty row
     pub fn add_row(&mut self) {
-        let row = FlexRow::new(&self.columns);
+        let row = FlexRow::new(&self.live_columns);
         self.rows.push(row);
     }
 
     /// Add a row with pre-set values
     pub fn add_row_with_values(&mut self, values: Vec<CellValue>) {
-        let mut row = FlexRow::new(&self.columns);
+        let mut row = FlexRow::new(&self.live_columns);
         for (i, value) in values.into_iter().enumerate() {
             row.set(i, value);
         }
@@ -666,37 +761,39 @@ impl FlexibleDataTable {
 
     /// Update dropdown options for a specific column
     pub fn set_dropdown_options(&mut self, col_idx: usize, labels: Vec<String>) {
-        if let Some(col) = self.columns.get_mut(col_idx) {
-            col.dropdown_labels = labels;
+        if let Some(col) = self.live_columns.get_mut(col_idx) {
+            col.dropdown_labels = labels.join(",");
         }
     }
 
     /// Set the list of hidden cells (replaces existing list)
-    pub fn set_hidden_cells(&mut self, cells: Vec<(usize, usize)>) {
-        self.hidden_cells = cells;
+    pub fn set_hidden_cells(&mut self, cells: Vec<LiveHiddenCell>) {
+        self.live_hidden_cells = cells;
     }
 
     /// Get the list of hidden cells
-    pub fn get_hidden_cells(&self) -> &[(usize, usize)] {
-        &self.hidden_cells
+    pub fn get_hidden_cells(&self) -> &[LiveHiddenCell] {
+        &self.live_hidden_cells
     }
 
     /// Add a cell to the hidden list
     pub fn add_hidden_cell(&mut self, row_idx: usize, col_idx: usize) {
-        let cell = (row_idx, col_idx);
-        if !self.hidden_cells.contains(&cell) {
-            self.hidden_cells.push(cell);
+        if !self.is_cell_hidden(row_idx, col_idx) {
+            self.live_hidden_cells.push(LiveHiddenCell {
+                row: row_idx as i64,
+                col: col_idx as i64,
+            });
         }
     }
 
     /// Remove a cell from the hidden list
     pub fn remove_hidden_cell(&mut self, row_idx: usize, col_idx: usize) {
-        self.hidden_cells.retain(|&c| c != (row_idx, col_idx));
+        self.live_hidden_cells.retain(|hc| !(hc.row as usize == row_idx && hc.col as usize == col_idx));
     }
 
     /// Clear all hidden cells
     pub fn clear_hidden_cells(&mut self) {
-        self.hidden_cells.clear();
+        self.live_hidden_cells.clear();
     }
 }
 
@@ -704,7 +801,7 @@ impl FlexibleDataTable {
 #[allow(dead_code)]
 impl FlexibleDataTableRef {
     /// Set the column configuration and redraw
-    pub fn set_columns(&self, cx: &mut Cx, columns: Vec<ColumnConfig>) {
+    pub fn set_columns(&self, cx: &mut Cx, columns: Vec<LiveColumnConfig>) {
         if let Some(mut inner) = self.borrow_mut() {
             inner.set_columns(columns);
             inner.redraw(cx);
@@ -712,7 +809,7 @@ impl FlexibleDataTableRef {
     }
 
     /// Get the column configuration
-    pub fn get_columns(&self) -> Vec<ColumnConfig> {
+    pub fn get_columns(&self) -> Vec<LiveColumnConfig> {
         if let Some(inner) = self.borrow() {
             inner.get_columns().to_vec()
         } else {
@@ -834,7 +931,7 @@ impl FlexibleDataTableRef {
     }
 
     /// Set the list of hidden cells and redraw
-    pub fn set_hidden_cells(&self, cx: &mut Cx, cells: Vec<(usize, usize)>) {
+    pub fn set_hidden_cells(&self, cx: &mut Cx, cells: Vec<LiveHiddenCell>) {
         if let Some(mut inner) = self.borrow_mut() {
             inner.set_hidden_cells(cells);
             inner.redraw(cx);
@@ -842,7 +939,7 @@ impl FlexibleDataTableRef {
     }
 
     /// Get the list of hidden cells
-    pub fn get_hidden_cells(&self) -> Vec<(usize, usize)> {
+    pub fn get_hidden_cells(&self) -> Vec<LiveHiddenCell> {
         if let Some(inner) = self.borrow() {
             inner.get_hidden_cells().to_vec()
         } else {
