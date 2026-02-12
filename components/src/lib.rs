@@ -53,6 +53,10 @@ pub mod dropdown;
 #[path ="./drawer/drawer.rs"]
 pub mod drawer;
 
+#[cfg(feature = "EditableList")]
+#[path ="./editable_list/editable_list.rs"]
+pub mod editable_list;
+
 #[cfg(feature = "Input")]
 #[path ="./input/input.rs"]
 pub mod input;
@@ -167,6 +171,8 @@ pub fn live_design(cx: &mut Cx) {
     dropdown::live_design(cx);
     #[cfg(feature = "Drawer")]
     drawer::live_design(cx);
+    #[cfg(feature = "EditableList")]
+    editable_list::live_design(cx);
     #[cfg(feature = "Input")]
     input::live_design(cx);
     #[cfg(feature = "Label")]

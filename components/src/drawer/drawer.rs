@@ -93,6 +93,11 @@ live_design! {
             flow: Right
             align: { y: 0.5 }
 
+            show_bg: true
+            draw_bg: {
+                color: #ffffff
+            }
+
             title = <Label> {
                 width: Fill
                 height: Fit
@@ -166,10 +171,15 @@ live_design! {
 
         body = <ScrollYView> {
             width: Fill
-            height: Fit
+            height: Fill
             padding: { left: 24, right: 24, top: 0, bottom: 16 }
             flow: Down
             spacing: 8
+
+            show_bg: true
+            draw_bg: {
+                color: #ffffff
+            }
 
             <Label> {
                 width: Fill
@@ -190,6 +200,11 @@ live_design! {
             flow: Right
             spacing: 8
             align: { x: 1.0, y: 0.5 }
+
+            show_bg: true
+            draw_bg: {
+                color: #ffffff
+            }
         }
     }
 
@@ -396,6 +411,8 @@ pub struct MpDrawerWidget {
     scroll_enabled: bool,
     #[rust]
     height_clamped: bool,
+    #[live]
+    draw_list: DrawList2d,
 }
 
 impl Widget for MpDrawerWidget {
@@ -427,16 +444,31 @@ impl Widget for MpDrawerWidget {
         }
     }
 
-    fn draw_walk(&mut self, cx: &mut Cx2d, scope: &mut Scope, walk: Walk) -> DrawStep {
+    fn draw_walk(&mut self, cx: &mut Cx2d, scope: &mut Scope, _walk: Walk) -> DrawStep {
         if !self.visible {
             return DrawStep::done();
         }
-        self.pass_size = cx.current_pass_size().into();
+
+        // Use overlay to draw on top of everything
+        self.draw_list.begin_overlay_reuse(cx);
+
+        let size = cx.current_pass_size();
+        self.pass_size = size.into();
+        cx.begin_root_turtle(size, Layout::flow_overlay());
+
         self.apply_animation_state(cx);
-        let result = self.view.draw_walk(cx, scope, walk);
+
+        // Draw the container with Fill size to cover the entire screen
+        let mut overlay_walk = Walk::fixed(size.x, size.y);
+        overlay_walk.abs_pos = Some(DVec2 { x: 0.0, y: 0.0 });
+        let _ = self.view.draw_walk(cx, scope, overlay_walk);
+
         self.update_drawer_size(cx);
         self.block_background_scroll(cx);
-        result
+        cx.end_pass_sized_turtle();
+        self.draw_list.end(cx);
+
+        DrawStep::done()
     }
 }
 
@@ -448,13 +480,13 @@ impl MpDrawerWidget {
         self.scroll_enabled = false;
         self.drawer_size = Vec2::default();
         self.start_animation(cx, 1.0);
-        self.redraw(cx);
+        cx.redraw_all();
     }
 
     /// Close the drawer
     pub fn close(&mut self, cx: &mut Cx) {
         self.start_animation(cx, 0.0);
-        self.redraw(cx);
+        cx.redraw_all();
     }
 
     /// Check if drawer is visible
@@ -501,7 +533,7 @@ impl MpDrawerWidget {
                 cx.unblock_scrolling();
             }
         }
-        self.redraw(cx);
+        cx.redraw_all();
     }
 
     fn apply_animation_state(&mut self, cx: &mut Cx) {
