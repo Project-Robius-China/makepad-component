@@ -4436,12 +4436,11 @@ live_design! {
                                 }
                             }
                         }
-                    } // close editable_list_modal
+                    }
 
                     demo_drawer_right = <MpDrawerWidget> {
                         container = <MpDrawerContainerRight> {
                             drawer = <MpDrawerRight> {
-
                                 header = {
                                     title = { text: "Quick Settings" }
                                 }
@@ -5453,7 +5452,6 @@ impl App {
             .set_text(cx, &format!("Tree Selected: {}", label));
         self.ui.redraw(cx);
     }
-
 }
 
 impl AppMain for App {

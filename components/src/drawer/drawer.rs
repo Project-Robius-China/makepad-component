@@ -93,11 +93,6 @@ live_design! {
             flow: Right
             align: { y: 0.5 }
 
-            show_bg: true
-            draw_bg: {
-                color: #ffffff
-            }
-
             title = <Label> {
                 width: Fill
                 height: Fit
@@ -118,6 +113,7 @@ live_design! {
                 show_bg: true
                 draw_bg: {
                     instance icon_color: (MUTED_FOREGROUND)
+                    instance hover_color: #e0e0e0
                     instance hover: 0.0
                     instance down: 0.0
 
@@ -127,7 +123,7 @@ live_design! {
                         let size = 6.0;
 
                         let hover_amount = max(self.hover, self.down * 0.6);
-                        let final_color = mix(self.icon_color, (FOREGROUND), hover_amount);
+                        let final_color = mix(self.icon_color, self.hover_color, hover_amount);
 
                         // X mark
                         sdf.move_to(c.x - size, c.y - size);
@@ -176,11 +172,6 @@ live_design! {
             flow: Down
             spacing: 8
 
-            show_bg: true
-            draw_bg: {
-                color: #ffffff
-            }
-
             <Label> {
                 width: Fill
                 height: Fit
@@ -200,11 +191,6 @@ live_design! {
             flow: Right
             spacing: 8
             align: { x: 1.0, y: 0.5 }
-
-            show_bg: true
-            draw_bg: {
-                color: #ffffff
-            }
         }
     }
 
@@ -575,11 +561,11 @@ impl MpDrawerWidget {
         if limit_height {
             self.view
                 .view(ids!(container.drawer))
-                .apply_over(cx, live! { walk: { height: (max_height) } });
+                .apply_over(cx, live! { height: (max_height) });
         } else if self.height_clamped {
             self.view
                 .view(ids!(container.drawer))
-                .apply_over(cx, live! { walk: { height: Fit } });
+                .apply_over(cx, live! { height: Fit });
         }
         self.height_clamped = limit_height;
 
@@ -588,7 +574,7 @@ impl MpDrawerWidget {
             self.scroll_enabled = use_scroll;
             if use_scroll {
                 self.view.view(ids!(container.drawer.body)).apply_over(cx, live! {
-                    walk: { height: Fill }
+                    height: Fill
                     scroll_bars: {
                         show_scroll_x: false,
                         show_scroll_y: true,
@@ -597,7 +583,7 @@ impl MpDrawerWidget {
                 });
             } else {
                 self.view.view(ids!(container.drawer.body)).apply_over(cx, live! {
-                    walk: { height: Fit }
+                    height: Fit
                     scroll_bars: { show_scroll_x: false, show_scroll_y: false }
                 });
             }
@@ -614,16 +600,16 @@ impl MpDrawerWidget {
         }
         match self.placement {
             MpDrawerPlacement::Right => {
-                drawer.apply_over(cx, live! { walk: { margin: { right: (-size.x * offset) } } });
+                drawer.apply_over(cx, live! { margin: { right: (-size.x * offset) } });
             }
             MpDrawerPlacement::Left => {
-                drawer.apply_over(cx, live! { walk: { margin: { left: (-size.x * offset) } } });
+                drawer.apply_over(cx, live! { margin: { left: (-size.x * offset) } });
             }
             MpDrawerPlacement::Top => {
-                drawer.apply_over(cx, live! { walk: { margin: { top: (-size.y * offset) } } });
+                drawer.apply_over(cx, live! { margin: { top: (-size.y * offset) } });
             }
             MpDrawerPlacement::Bottom => {
-                drawer.apply_over(cx, live! { walk: { margin: { bottom: (-size.y * offset) } } });
+                drawer.apply_over(cx, live! { margin: { bottom: (-size.y * offset) } });
             }
         }
 
@@ -701,7 +687,7 @@ impl MpDrawer {
 
         if fixed_height {
             self.view(ids!(body)).apply_over(cx, live! {
-                walk: { height: Fill }
+                height: Fill
                 scroll_bars: {
                     show_scroll_x: false,
                     show_scroll_y: true,
@@ -711,7 +697,7 @@ impl MpDrawer {
         } else {
             self.view.walk.height = Size::fit();
             self.view(ids!(body)).apply_over(cx, live! {
-                walk: { height: Fit }
+                height: Fit
                 scroll_bars: {
                     show_scroll_x: false,
                     show_scroll_y: false

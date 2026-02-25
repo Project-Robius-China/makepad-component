@@ -4,11 +4,10 @@ use crate::{button::MpButtonWidgetRefExt, drawer::MpDrawerWidgetWidgetExt};
 
 live_design! {
     use link::theme::*;
+    use link::theme_colors::*;
     use link::shaders::*;
     use link::widgets::*;
 
-    use link::theme_colors::*;
-    use crate::theme::radius::*;
     use crate::drawer::*;
     use crate::button::*;
 
@@ -62,27 +61,6 @@ live_design! {
                 flow: RightWrap
 
                 margin: {left: 20}
-                show_bg: true
-                draw_bg: {
-                    color: (CARD)
-                    instance border_radius: 8.0
-                    instance border_color: (BORDER)
-                    instance border_width: 1.0
-
-                    fn pixel(self) -> vec4 {
-                        let sdf = Sdf2d::viewport(self.pos * self.rect_size);
-                        sdf.box(
-                            self.border_width,
-                            self.border_width,
-                            self.rect_size.x - self.border_width * 2.0,
-                            self.rect_size.y - self.border_width * 2.0,
-                            max(1.0, self.border_radius - self.border_width)
-                        );
-                        sdf.fill(self.color);
-                        sdf.stroke(self.border_color, self.border_width);
-                        return sdf.result;
-                    }
-                }
 
                 // Template for child items
                 template: <View> {
@@ -93,6 +71,7 @@ live_design! {
                     <RoundedView> {
                         width: Fill, height: Fill
                         padding: 0
+                        show_bg: true
                         draw_bg: {
                             color: (PRIMARY)
                             border_radius: 8.0
@@ -122,8 +101,8 @@ live_design! {
 
         // Right drawer for item options
         drawer = <MpDrawerWidget> {
-            container = <MpDrawerContainerRight> {
-                drawer_right = <MpDrawerRight> {
+            container = {
+                drawer = {
                     width: 320
 
                     header = {
@@ -196,8 +175,6 @@ pub struct MpDynamicList {
     plus_template: Option<LivePtr>,
     #[rust]
     plus: WidgetRef,
-    #[live]
-    draw_list: DrawList2d,
 }
 
 impl LiveHook for MpDynamicList {
@@ -210,40 +187,46 @@ impl Widget for MpDynamicList {
     fn draw_walk(&mut self, cx: &mut Cx2d, scope: &mut Scope, walk: Walk) -> DrawStep {
         cx.begin_turtle(walk, self.layout);
 
-        // First pass: draw all children and collect their positions
-        let mut child_rects = Vec::new();
-        for child_ref in self.children.iter_mut() {
-            let _ = child_ref.draw(cx, scope);
-            child_rects.push(child_ref.area().rect(cx));
+        // Draw each child with its setting widget on top
+        for (child_ref, setting_ref) in self.children.iter_mut().zip(self.setting_children.iter_mut()) {
+            // Use the child's walk for the container (preserves margin, size)
+            let child_walk = child_ref.walk(cx);
+            let container_walk = Walk {
+                abs_pos: child_walk.abs_pos,
+                margin: child_walk.margin,
+                width: child_walk.width,
+                height: child_walk.height,
+                metrics: child_walk.metrics,
+            };
+            cx.begin_turtle(container_walk, Layout::flow_overlay());
+            // Draw the child first (with no margin since container has it)
+            let inner_walk = Walk {
+                abs_pos: None,
+                margin: Margin::default(),
+                width: Size::fill(),
+                height: Size::fill(),
+                metrics: Metrics::default(),
+            };
+            let _ = child_ref.draw_walk(cx, scope, inner_walk);
+            //let _ = child_ref.draw(cx, scope);
+            // Draw the setting on top (fills the same space)
+            let _ = setting_ref.draw(cx, scope);
+            cx.end_turtle();
         }
+
         let _ = self.plus.draw(cx, scope);
         cx.end_turtle_with_area(&mut self.area);
-
-        // Second pass: draw setting overlays on top of each child
-        self.draw_list.begin_overlay_reuse(cx);
-        let size = cx.current_pass_size();
-        cx.begin_root_turtle(size, Layout::flow_overlay());
-
-        for (setting_ref, child_rect) in self.setting_children.iter_mut().zip(child_rects.iter()) {
-            let mut setting_walk = setting_ref.walk(cx);
-            setting_walk.abs_pos = Some(child_rect.pos);
-            setting_walk.width = Size::Fixed(child_rect.size.x);
-            setting_walk.height = Size::Fixed(child_rect.size.y);
-            let _ = setting_ref.draw_walk(cx, scope, setting_walk);
-        }
-
-        cx.end_pass_sized_turtle();
-        self.draw_list.end(cx);
 
         DrawStep::done()
     }
 
     fn handle_event(&mut self, cx: &mut Cx, event: &Event, scope: &mut Scope) {
-        for widget_ref in self.children.iter_mut() {
-            widget_ref.handle_event(cx, event, scope);
-        }
+        // Handle settings first since they're drawn on top
         for setting_ref in self.setting_children.iter_mut() {
             setting_ref.handle_event(cx, event, scope);
+        }
+        for widget_ref in self.children.iter_mut() {
+            widget_ref.handle_event(cx, event, scope);
         }
         self.plus.handle_event(cx, event, scope);
         self.match_event(cx, event);
@@ -435,7 +418,7 @@ impl Widget for MpEditableList {
     fn handle_event(&mut self, cx: &mut Cx, event: &Event, scope: &mut Scope) {
         self.view.handle_event(cx, event, scope);
         self.view
-            .view(ids!(drawer.container.drawer_right))
+            .view(ids!(drawer.container.drawer))
             .handle_event(cx, event, scope);
         self.match_event(cx, event);
     }
@@ -469,6 +452,7 @@ impl MatchEvent for MpEditableList {
             }
             if let Some(idx) = list.configure_requested(actions) {
                 configure_idx = Some(idx);
+                println!("configure idx: {}", idx);
             }
 
             if drawer.mp_button(ids!(body.configure_btn)).clicked(actions) {
@@ -565,7 +549,7 @@ impl MpEditableList {
     /// Open the drawer for adding a new item (hides edit buttons)
     pub fn open_drawer_for_add(&mut self, cx: &mut Cx) {
         self.selected_index = None;
-        let drawer_view = self.view.view(ids!(drawer.container.drawer_right));
+        let drawer_view = self.view.view(ids!(drawer.container.drawer));
         drawer_view
             .label(ids!(header.title))
             .set_text(cx, "Add Item");
@@ -578,7 +562,7 @@ impl MpEditableList {
     /// Open the drawer with a specific item selected (shows edit buttons)
     pub fn open_drawer_for_item(&mut self, cx: &mut Cx, index: usize) {
         self.selected_index = Some(index);
-        let drawer_view = self.view.view(ids!(drawer.container.drawer_right));
+        let drawer_view = self.view.view(ids!(drawer.container.drawer));
         drawer_view
             .label(ids!(header.title))
             .set_text(cx, &format!("Item {}", index));

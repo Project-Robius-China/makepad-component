@@ -311,6 +311,35 @@ impl LiveColumnConfig {
             self.dropdown_labels.split(',').map(|s| s.trim().to_string()).collect()
         }
     }
+    /// Create a new dropdown column
+    pub fn dropdown(name: impl Into<String>, labels: Vec<String>, width: f64) -> Self {
+        Self {
+            name: name.into(),
+            cell_type: CellType::DropDown,
+            width,
+            dropdown_labels: labels.join(","),
+        }
+    }
+
+    /// Create a new text input column
+    pub fn text_input(name: impl Into<String>, width: f64) -> Self {
+        Self {
+            name: name.into(),
+            cell_type: CellType::TextInput,
+            width,
+            dropdown_labels: String::new(),
+        }
+    }
+
+    /// Create a new color picker column
+    pub fn color_picker(name: impl Into<String>, width: f64) -> Self {
+        Self {
+            name: name.into(),
+            cell_type: CellType::ColorPicker,
+            width,
+            dropdown_labels: String::new(),
+        }
+    }
 }
 
 /// Live-compatible hidden cell configuration for DSL
@@ -335,51 +364,6 @@ impl LiveHiddenCell {
     /// Convert to (usize, usize) tuple
     pub fn to_tuple(&self) -> (usize, usize) {
         (self.row.max(0) as usize, self.col.max(0) as usize)
-    }
-}
-
-/// Configuration for a single column
-#[derive(Clone, Debug)]
-pub struct ColumnConfig {
-    /// Column header name
-    pub name: String,
-    /// Type of cell for this column
-    pub cell_type: CellType,
-    /// Width of the column in pixels
-    pub width: f64,
-    /// Options for dropdown cells (labels)
-    pub dropdown_labels: Vec<String>,
-}
-
-impl ColumnConfig {
-    /// Create a new dropdown column
-    pub fn dropdown(name: impl Into<String>, labels: Vec<String>, width: f64) -> Self {
-        Self {
-            name: name.into(),
-            cell_type: CellType::DropDown,
-            width,
-            dropdown_labels: labels,
-        }
-    }
-
-    /// Create a new text input column
-    pub fn text_input(name: impl Into<String>, width: f64) -> Self {
-        Self {
-            name: name.into(),
-            cell_type: CellType::TextInput,
-            width,
-            dropdown_labels: Vec::new(),
-        }
-    }
-
-    /// Create a new color picker column
-    pub fn color_picker(name: impl Into<String>, width: f64) -> Self {
-        Self {
-            name: name.into(),
-            cell_type: CellType::ColorPicker,
-            width,
-            dropdown_labels: Vec::new(),
-        }
     }
 }
 

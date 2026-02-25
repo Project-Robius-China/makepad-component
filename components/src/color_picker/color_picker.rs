@@ -338,17 +338,17 @@ live_design! {
                 height: Fit,
                 flow: Right,
                 spacing: 8,
-                padding: 12,
+                padding: 5,
                 align: { y: 0.5 }
 
                 fold_button = <MpColorSwatch> {
-                    width: 32,
-                    height: 32,
+                    width: 20,
+                    height: 20,
                 }
 
                 hex_input = <TextInput> {
                     width: 110,
-                    height: 32,
+                    height: 20,
                     padding: { left: 8, right: 8 }
                     text: "#FF0000"
                     draw_bg: {
