@@ -42,7 +42,7 @@
 
 ### コンポーネント (v0.1.0)
 
-Accordion、Alert、Avatar、Badge、Button、Calendar、Card、Checkbox、Color Picker、Divider、Drawer、Dropdown、Input、Label、Layout、Link、List、Modal、Notification、Page Flip、Popover、Progress、Radio、Skeleton、Slider、Spinner、Space、Switch、Tab、Table、Text、Tooltip。
+Accordion、Alert、Avatar、Badge、Button、Calendar、Card、Checkbox、Color Picker、Command Palette、Divider、Drawer、Dropdown、Input、Label、Layout、Link、List、Modal、Notification、Page Flip、Popover、Progress、Radio、Skeleton、Slider、Spinner、Space、Switch、Tab、Table、Text、Tooltip。
 
 ### Shell 連携
 

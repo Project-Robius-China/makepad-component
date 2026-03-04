@@ -40,6 +40,9 @@ pub mod color_picker;
 #[cfg(feature = "ColorPicker")]
 #[path ="./fold_header_dropdown/fold_header_dropdown.rs"]
 pub mod fold_header_dropdown;
+#[cfg(feature = "CommandPalette")]
+#[path ="./command_palette/command_palette.rs"]
+pub mod command_palette;
 
 #[cfg(feature = "Divider")]
 #[path ="./divider/divider.rs"]
@@ -177,6 +180,8 @@ pub fn live_design(cx: &mut Cx) {
     fold_header_dropdown::live_design(cx);
     #[cfg(feature = "ColorPicker")]
     color_picker::live_design(cx);
+    #[cfg(feature = "CommandPalette")]
+    command_palette::live_design(cx);
     #[cfg(feature = "Divider")]
     divider::live_design(cx);
     #[cfg(feature = "Dropdown")]

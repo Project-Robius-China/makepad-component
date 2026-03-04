@@ -27,6 +27,7 @@ use makepad_components::dock::MpDockToggleRefExt;
 use makepad_components::dock::MpDockAreaWidgetRefExt;
 use makepad_components::dock::MpDockPlacement;
 use makepad_components::select::MpSelectWidgetWidgetRefExt;
+use makepad_components::command_palette::{CommandPaletteItem, MpCommandPaletteWidgetRefExt};
 
 live_design! {
     use link::theme::*;
@@ -71,6 +72,7 @@ live_design! {
     use makepad_components::dock::*;
     use makepad_components::select::*;
     use makepad_components::editable_list::*;
+    use makepad_components::command_palette::*;
 
     // ============================================================
     // Section Header Component
@@ -4514,6 +4516,34 @@ live_design! {
 
                             <MpDivider> {}
 
+                            // ===== Command Palette Section =====
+                            <View> {
+                                width: Fill, height: Fit,
+                                flow: Down,
+                                spacing: 16,
+
+                                <SectionHeader> { text: "Command Palette" }
+
+                                <SubsectionLabel> {
+                                    text: "Type to filter, use ↑/↓ to navigate, Enter to execute, Esc to close"
+                                }
+
+                                command_palette_demo = <MpCommandPalette> {
+                                    width: 520
+                                    placeholder: "Search actions (e.g. open, theme, drawer)..."
+                                }
+
+                                command_palette_status = <Label> {
+                                    draw_text: {
+                                        text_style: <THEME_FONT_REGULAR>{ font_size: 12.0 }
+                                        color: (MUTED_FOREGROUND)
+                                    }
+                                    text: "Last command: none"
+                                }
+                            }
+
+                            <MpDivider> {}
+
                             // ===== FlexibleDataTable Section =====
                             <View> {
                                 width: Fill, height: Fit,
@@ -4896,6 +4926,21 @@ impl MatchEvent for App {
         self.ui.mp_select_widget(ids!(select_disabled)).set_labels(cx, fruit_labels);
         self.ui.mp_select_widget(ids!(select_disabled)).set_selected_index(cx, 0);
 
+        // Initialize command palette items
+        self.ui.mp_command_palette(ids!(command_palette_demo)).set_items(
+            cx,
+            vec![
+                CommandPaletteItem::new("open_modal", "Open Modal Demo", "Navigation", "Enter", &["modal", "dialog"]),
+                CommandPaletteItem::new("close_drawers", "Close All Drawers", "Navigation", "Esc", &["drawer", "close"]),
+                CommandPaletteItem::new("switch_to_data", "Switch To Data Tab", "Navigation", "D", &["data", "tab", "page"]),
+                CommandPaletteItem::new("toggle_theme", "Toggle Theme", "Settings", "T", &["theme", "dark", "light"]),
+                CommandPaletteItem::new("show_success", "Show Success Notification", "Feedback", "N", &["notification", "toast", "success"]),
+                CommandPaletteItem::new("increase_radius", "Increase Radius Demo", "Form", "+", &["radius", "corner", "slider"]),
+                CommandPaletteItem::new("reset_radius", "Reset Radius Demo", "Form", "0", &["radius", "reset"]),
+                CommandPaletteItem::new("coming_soon", "Open Team Workspace", "Project", "W", &["workspace", "team"]).disabled(),
+            ],
+        );
+
         // Initialize dynamic list with some items
         self.dynamic_list_count = 0;
         for _ in 0..2 {
@@ -4952,6 +4997,63 @@ impl MatchEvent for App {
             self.counter += 1;
             self.ui.label(ids!(counter_label))
                 .set_text(cx, &format!("Clicked: {} times", self.counter));
+        }
+
+        if self.ui.mp_command_palette(ids!(command_palette_demo)).opened(&actions) {
+            self.ui
+                .label(ids!(command_palette_status))
+                .set_text(cx, "Palette opened");
+        }
+
+        if self.ui.mp_command_palette(ids!(command_palette_demo)).closed(&actions) {
+            self.ui
+                .label(ids!(command_palette_status))
+                .set_text(cx, "Palette closed");
+        }
+
+        if let Some((id, title, group)) = self.ui.mp_command_palette(ids!(command_palette_demo)).executed(&actions) {
+            self.ui
+                .label(ids!(command_palette_status))
+                .set_text(cx, &format!("Executed: [{}] {}", group, title));
+
+            match id.as_str() {
+                "open_modal" => {
+                    self.ui.mp_modal_widget(ids!(demo_modal)).open(cx);
+                    self.ui.label(ids!(modal_status)).set_text(cx, "Modal opened from palette");
+                }
+                "close_drawers" => {
+                    self.ui.mp_drawer_widget(ids!(demo_drawer_right)).close(cx);
+                    self.ui.mp_drawer_widget(ids!(demo_drawer_left)).close(cx);
+                    self.ui.mp_drawer_widget(ids!(demo_drawer_top)).close(cx);
+                    self.ui.mp_drawer_widget(ids!(demo_drawer_bottom)).close(cx);
+                    self.ui.label(ids!(drawer_status)).set_text(cx, "All drawers closed from palette");
+                }
+                "switch_to_data" => {
+                    self.select_category(cx, 5);
+                }
+                "toggle_theme" => {
+                    self.is_dark = !self.is_dark;
+                    let mode = if self.is_dark { ThemeMode::Dark } else { ThemeMode::Light };
+                    apply_theme(cx, mode);
+                    self.sync_theme_ui(cx);
+                }
+                "show_success" => {
+                    self.ui.mp_notification_widget(ids!(demo_notification)).show_message(
+                        cx,
+                        "Palette Action",
+                        "Command executed successfully.",
+                    );
+                }
+                "increase_radius" => {
+                    self.radius_demo_value = (self.radius_demo_value + 2.0).min(16.0);
+                    self.apply_radius_demo(cx, self.radius_demo_value);
+                }
+                "reset_radius" => {
+                    self.radius_demo_value = 2.0;
+                    self.apply_radius_demo(cx, self.radius_demo_value);
+                }
+                _ => {}
+            }
         }
 
         // Handle Calendar date selection

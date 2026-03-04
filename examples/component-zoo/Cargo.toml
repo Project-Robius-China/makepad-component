@@ -16,6 +16,7 @@ makepad-components = { workspace = true, features = [
     "Card",
     "Checkbox",
     "ColorPicker",
+    "CommandPalette",
     "Divider",
     "Dropdown",
     "Drawer",
